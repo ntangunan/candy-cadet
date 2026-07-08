@@ -1,0 +1,25 @@
+================================================================================
+C.H.U.D. BOT - MASTER TODO LIST
+================================================================================
+
+MECHANICAL & HARDWARE TASK POOL
+  [ ] Design and 3D print/fabricate chassis to balance on a dual-wheel setup or use a third caster wheel.
+  [ ] Securely mount the MacBook Pro without obstructing exhaust fans.
+  [ ] Build the common-ground power distribution circuit (Battery -> Regulators -> Arduinos/Motors).
+  [ ] Mount and align wheel encoders with motor shafts.
+
+EMBEDDED & FIRMWARE TASK POOL (Arduino R4 / R3)
+  [ ] Write basic PWM motor test sketch for the L9110 driver.
+  [ ] Write encoder counting code using hardware interrupts.
+  [ ] Implement a basic PID library loop for precise RPM matching on both wheels.
+  [ ] Write I2C communication interface code to pass LED commands from R4 to R3.
+  [ ] Implement the serial packet parser on the R4 to receive MacBook strings.
+
+SOFTWARE & AI TASK POOL (MacBook Pro Stack)
+  [X] Initialize project repository.
+  [X] Setup skeleton of software architecture.
+  [ ] Establish a Python virtual environment and install OpenCV, PySerial, and Ollama.
+  [ ] Write a script to fetch camera frames and run YOLO object detection in real-time.
+  [ ] Optimize local LLM/Ollama parameters for lowest latency on Intel architecture.
+  [ ] Set up SQLite database schema to store "memories" (User Name, Interaction Count, Last Sentiments).
+  [ ] Code the main executive script (Robot Brain State Machine) to stitch Vision, Voice, and Serial IO together.
