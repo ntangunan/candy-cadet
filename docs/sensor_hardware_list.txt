@@ -1,0 +1,23 @@
+================================================================================
+C.H.U.D. BOT - SENSOR & HARDWARE COMPONENT LIST
+================================================================================
+
+1. PRIMARY COMPUTATION & VISION
+   - MacBook Pro (Intel Core i5/i7, A1708): High-level processing, AI, Local LLM.
+   - USB Webcam (1080p, Wide Angle): Vision input for YOLO and OpenCV.
+   - USB Microphone / Mac Internal Mic: Speech input for Whisper STT.
+
+2. ACTUATORS & DRIVERS
+   - 2x TT Motors or Custom DC Motors: Main drive wheels.
+   - 2x Wheel Encoders (Quadrature Hall-Effect): For velocity and distance feedback.
+   - 1x L9110 Dual Channel DC Motor Driver Module: H-bridge control for drive motors.
+   - 2x SG90 or MG90S Micro Servos: Flaps, lens movement, or arm gesticulation.
+
+3. SPATIAL SENSING & SAFETY
+   - 1x MPU6050 (or similar) 6-DOF IMU: For tilt detection, orientation, and balancing telemetry.
+   - 1x HC-SR04 Ultrasonic Sensor (or VL53L0X Time-of-Flight): Forward-facing obstacle detection.
+
+4. USER INTERFACE & COSMETICS
+   - 1x WS2812B NeoPixel Ring (e.g., 12 or 16 LEDs): Claptrap's central glowing "eye".
+   - 1x Piezo Buzzer or DFPlayer Mini MP3 Module: For low-level robotic bleeps/bloops.
+   - 1x Voltage Divider Circuit: For monitoring main robot battery health via Arduino.
