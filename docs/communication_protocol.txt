@@ -1,0 +1,41 @@
+================================================================================
+C.H.U.D. BOT - COMMUNICATION SPECIFICATION
+================================================================================
+
+1. SYSTEM ARCHITECTURE OVERVIEW
+   [MacBook Pro (Brain)] <--- USB Serial ---> [Arduino Uno R4 (Brainstem)]
+                                                      |
+                                                  I2C / SPI
+                                                      |
+                                            [Arduino Uno R3 (Auxiliary)]
+
+2. SERIAL CONFIGURATION (MacBook <-> Uno R4)
+   - Baud Rate: 115200 (or 250000 for higher throughput)
+   - Data Bits: 8
+   - Parity: None
+   - Stop Bits: 1
+   - Framing: Packetized JSON or Custom Binary (Recommended: Lightweight Custom String)
+
+3. PACKET STRUCTURE (Custom String Format)
+   Format: $[Command_Type],[Param1],[Param2],...;[Checksum]\n
+   Example: $DRIVE,45,-45;0xAA\n
+
+4. MESSAGE DEFINITIONS (MacBook to Uno R4 - DOWNLINK)
+   - $DRIVE,[left_speed],[right_speed];  -> Set target wheel velocities (PID input)
+   - $SERVO,[id],[angle];                -> Move specific expression/arm servo
+   - $LED_CMD,[mode_id],[r],[g],[b];     -> Pass-through to R3 for visual effects
+   - $ESTOP;;                            -> Emergency stop all motors immediately
+
+5. MESSAGE DEFINITIONS (Uno R4 to MacBook - UPLINK)
+   - $TELEMETRY,[enc_l],[enc_r],[imu_p],[imu_r],[imu_y]; -> Encoder & IMU data
+   - $PING,[distance_cm];                                -> Ultrasonic/TOF sensor data
+   - $STATUS,[battery_v],[sys_state];                     -> Health monitoring
+
+6. ARDUINO R4 TO ARDUINO R3 INTER-BOARD PROTOCOL (I2C)
+   - Uno R4 Address: Main (Controller)
+   - Uno R3 Address: 0x08 (Target)
+   - Commands: Direct byte commands for LED matrices, buzzer tones, or lighting animations.
+
+7. ERROR HANDLING & FAILSAFES
+   - Heartbeat: MacBook must send a ping every 500ms. If missed, Uno R4 cuts motor power.
+   - Malformed Packets: Discarded if checksum or terminating characters are missing.
