@@ -1,0 +1,43 @@
+================================================================================
+C.H.U.D. BOT - PIN ASSIGNMENTS
+================================================================================
+
+--------------------------------------------------------------------------------
+ARDUINO UNO R4 MINIMA (Main Control, Motors, Critical Sensors)
+--------------------------------------------------------------------------------
+Digital Pins:
+  - D0: RX (USB Serial / Debug)
+  - D1: TX (USB Serial / Debug)
+  - D2: Left Wheel Encoder - Phase A (Interrupt Pin)
+  - D3: Left Wheel Encoder - Phase B (Interrupt Pin)
+  - D4: Right Wheel Encoder - Phase A (Interrupt Pin)
+  - D5: Right Wheel Encoder - Phase B (Interrupt Pin)
+  - D6: L9110 Motor Driver - Motor A Input 1 (PWM)
+  - D7: L9110 Motor Driver - Motor A Input 2 (PWM)
+  - D8: L9110 Motor Driver - Motor B Input 1 (PWM)
+  - D9: L9110 Motor Driver - Motor B Input 2 (PWM)
+  - D10: Ultrasonic Sensor - Trigger
+  - D11: Ultrasonic Sensor - Echo
+  - D12: Servo 1 (Eye/Flap Movement) (PWM)
+  - D13: Servo 2 (Arm/Body Tilt) (PWM)
+
+Analog Pins:
+  - A0: Battery Voltage Divider Input (Analog Read)
+  - A1: Free
+  - A2: Free
+  - A3: Free
+  - A4: I2C SDA (To MPU6050 IMU and Arduino Uno R3)
+  - A5: I2C SCL (To MPU6050 IMU and Arduino Uno R3)
+
+--------------------------------------------------------------------------------
+ARDUINO UNO R3 (Auxiliary Systems: LEDs, Sound, Displays)
+--------------------------------------------------------------------------------
+Digital Pins:
+  - D2: NeoPixel / WS2812B LED Ring (Eye Expression)
+  - D3: NeoPixel LED Strip (Body status/animations)
+  - D4: Piezo Buzzer / Audio Module Trigger 1
+  - D5: Audio Module Trigger 2
+  
+Analog Pins:
+  - A4: I2C SDA (From Arduino Uno R4)
+  - A5: I2C SCL (From Arduino Uno R4)
