@@ -3,10 +3,14 @@ C.H.U.D. BOT - MASTER TODO LIST
 ================================================================================
 
 MECHANICAL & HARDWARE TASK POOL
-  [ ] Design and 3D print/fabricate chassis to balance on a dual-wheel setup or use a third caster wheel.
-  [ ] Securely mount the MacBook Pro without obstructing exhaust fans.
+  [ ] Design body via cardboard and hot glue to balance electronics on 2 wheels
+      { } Create TT Motor mounts
+      { } 3D print/fabricate all components if time allows
+      { } Use of 3 wheels if unable to stabilize?
+  [ ] Place ESP32-Cam in eye position for scenary scan
   [ ] Build the common-ground power distribution circuit (Battery -> Regulators -> Arduinos/Motors).
   [ ] Mount and align wheel encoders with motor shafts.
+  [ ] Align accelerometer to middle of robot to measure tilt and position
 
 EMBEDDED & FIRMWARE TASK POOL (Arduino R4 / R3)
   [ ] Write basic PWM motor test sketch for the L9110 driver.
@@ -31,3 +35,4 @@ SOFTWARE & AI TASK POOL (MacBook Pro Stack)
   [ ] Optimize local LLM/Ollama parameters for lowest latency on Intel architecture.
   [ ] Set up SQLite database schema to store "memories" (User Name, Interaction Count, Last Sentiments).
   [ ] Code the main executive script (Robot Brain State Machine) to stitch Vision, Voice, and Serial IO together.
+  [ ] Communicate images and analysis between ESP32-Cam and MacBook
