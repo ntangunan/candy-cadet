@@ -18,6 +18,14 @@ EMBEDDED & FIRMWARE TASK POOL (Arduino R4 / R3)
 SOFTWARE & AI TASK POOL (MacBook Pro Stack)
   [X] Initialize project repository.
   [X] Setup skeleton of software architecture.
+  [ ] Learn Serial Communication through a series of projects
+    [ ] Project 1: Serial Basics
+    [ ] Project 2: Sending commands to Arduino
+    [ ] Project 3: Build a Communication protocol
+    [ ] Project 4: Return Sensor Data
+    [ ] Project 5: Structured Messages
+    [ ] Project 6: Continuous Communication
+    [ ] Project 7: Asynchronous Communication
   [ ] Establish a Python virtual environment and install OpenCV, PySerial, and Ollama.
   [ ] Write a script to fetch camera frames and run YOLO object detection in real-time.
   [ ] Optimize local LLM/Ollama parameters for lowest latency on Intel architecture.
