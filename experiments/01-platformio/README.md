@@ -37,11 +37,11 @@ This experiment verifies that the entire development toolchain works before intr
 
 ## Tasks
 
-- [ ] Create PlatformIO project
-- [ ] Build firmware
-- [ ] Upload firmware
-- [ ] Print "Hello World" over Serial
-- [ ] Verify serial monitor output
+- [X] Create PlatformIO project
+- [X] Build firmware
+- [X] Upload firmware
+- [X] Print "Hello World" over Serial
+- [X] Verify serial monitor output
 
 ---
 
