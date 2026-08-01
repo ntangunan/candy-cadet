@@ -14,3 +14,9 @@ What is this project?
     - ESP32-CAM, the middle man: records scene, sends to brain, then receives simpler code to translate to the body
     - Arduino Uno r4 Minima, the body: receives commands and activates all motors for physical reaction
     
+Firmware
+    PlatformIO project: firmware
+    Target Hardware: ESP32 Wrover
+    Development environment: VS Code + PlatformIO
+    Build Instructions: 
+    Flash Instructions:
