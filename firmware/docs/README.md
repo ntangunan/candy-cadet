@@ -1,61 +1,114 @@
-# Phase 2 — GPIO Bring-Up
+# Candy Cadet Firmware
 
-## Overview
+Embedded firmware for the **Candy Cadet** robotics project.
 
-The goal of this milestone was to establish the first professional firmware architecture for the Candy Cadet project while validating communication between the ESP32 and simple digital hardware.
+This repository contains the firmware that runs on the ESP32 microcontroller responsible for low-level hardware control, device management, and real-time robot behavior.
 
-Rather than creating a single Arduino sketch, this phase focused on building a modular firmware architecture that separates hardware access, device drivers, and application logic. The result is a reusable foundation that future firmware features—including PWM, sensors, communication, and state machines—can build upon.
-
----
-
-## Objectives
-
-* Create a reusable GPIO Hardware Abstraction Layer (HAL)
-* Separate hardware-specific code from application logic
-* Implement reusable LED and Button device drivers
-* Validate firmware architecture using real hardware
-* Test the firmware on an ESP32 development board
+This firmware is designed using professional embedded software engineering practices, emphasizing modularity, hardware abstraction, maintainability, scalability, and testability.
 
 ---
 
-## Hardware
+# Purpose
 
-### Components
+The firmware serves two primary purposes:
 
-* Freenove ESP32-WROVER
-* Breadboard
-* External LED
-* 220 Ω resistor
-* Push button
-* Jumper wires
+1. Control the hardware that powers Candy Cadet.
+2. Serve as a learning platform for professional embedded firmware development.
 
-### Wiring
-
-#### LED
-
-* GPIO2 → 220 Ω resistor → LED anode (+)
-* LED cathode (−) → GND
-
-#### Button
-
-* GPIO15 → Push button → GND
-
-The button uses the ESP32's internal pull-up resistor (`INPUT_PULLUP`), so no external resistor is required.
+The project is intentionally built using engineering practices commonly found in robotics and embedded software teams rather than focusing solely on making the robot function.
 
 ---
 
-## Firmware Architecture
+# Project Goals
 
-```text
-main.cpp
+The firmware is being developed to gain practical experience with:
+
+* Embedded software architecture
+* Hardware abstraction layers (HAL)
+* Modular C++ design
+* GPIO
+* Timers
+* PWM
+* UART
+* SPI
+* I2C
+* ADC
+* State machines
+* Cooperative scheduling
+* Real-time programming
+* Embedded debugging
+* Power management
+* Firmware testing
+* Documentation
+* Professional Git workflows
+
+Every milestone builds toward creating firmware that is clean, reusable, and easy to extend as the robot becomes more capable.
+
+---
+
+# Development Philosophy
+
+The firmware follows several guiding principles.
+
+## Separation of Concerns
+
+Each module owns a single responsibility.
+
+Application logic should not manipulate hardware directly.
+
+Hardware-specific code should remain isolated inside the Hardware Abstraction Layer.
+
+---
+
+## Hardware Abstraction
+
+Application code should never call Arduino functions such as:
+
+* `pinMode()`
+* `digitalWrite()`
+* `digitalRead()`
+
+Instead, higher-level modules communicate with reusable hardware interfaces.
+
+---
+
+## Modular Design
+
+Each physical device is represented by its own module.
+
+Examples include:
+
+* LED
+* Button
+* Servo
+* Sensors
+* Motors
+
+This makes devices reusable and easier to test independently.
+
+---
+
+## Readability
+
+Firmware should prioritize clarity over cleverness.
+
+Code should be understandable months later without requiring extensive explanation.
+
+---
+
+## Scalability
+
+The firmware architecture is intended to scale from a simple LED and button to a complete interactive animatronic robot with multiple sensors, actuators, communication interfaces, and behavioral systems.
+
+---
+
+# Firmware Architecture
+
+```
+Application
     │
     ▼
-Application Layer
-    │
-    ▼
-Device Layer
- ├── LED
- └── Button
+Device Drivers
     │
     ▼
 Hardware Abstraction Layer (HAL)
@@ -67,164 +120,264 @@ Arduino Framework
 ESP32 Hardware
 ```
 
-### Layer Responsibilities
+## Layer Responsibilities
 
-#### main.cpp
-
-* Entry point of the firmware
-* Initializes the system
-* Starts the application
-* Runs the main update loop
-
-#### Application Layer
+### Application Layer
 
 Responsible for robot behavior.
 
-For this milestone:
+Examples:
 
-* Initialize the LED
-* Initialize the button
-* Read the button state
-* Control the LED
-
-#### Device Layer
-
-Represents hardware devices.
-
-**LED**
-
-* Initialize LED
-* Turn on
-* Turn off
-* Toggle
-
-**Button**
-
-* Initialize button
-* Detect button presses
-
-#### Hardware Abstraction Layer (HAL)
-
-Provides a reusable interface for GPIO operations.
-
-Responsibilities:
-
-* Configure pins
-* Read digital inputs
-* Write digital outputs
-
-This layer is the only part of the firmware that directly interacts with the Arduino GPIO API.
-
-#### Board Configuration
-
-The board configuration file contains hardware-specific information, including:
-
-* Status LED GPIO
-* User button GPIO
-
-Changing hardware connections only requires updating this configuration instead of modifying application code.
+* Initialize devices
+* Coordinate subsystems
+* Control robot logic
+* Execute state transitions
 
 ---
 
-## Directory Structure
+### Device Layer
 
-```text
-src/
+Represents physical hardware.
+
+Each module exposes behaviors rather than GPIO operations.
+
+Examples:
+
+* LED
+* Button
+* Servo
+* Sensor
+
+---
+
+### Hardware Abstraction Layer
+
+Provides reusable interfaces to ESP32 peripherals.
+
+Examples:
+
+* GPIO
+* PWM
+* UART
+* ADC
+* SPI
+* I2C
+
+Only the HAL communicates directly with the Arduino framework.
+
+---
+
+### Board Configuration
+
+The board configuration centralizes hardware-specific information such as GPIO assignments.
+
+Changing wiring should require modifying only the board configuration rather than application logic.
+
+---
+
+# Directory Structure
+
+```
+firmware/
 │
-├── main.cpp
+├── README.md
 │
-├── app/
-│   ├── application.cpp
-│   └── application.h
+├── docs/
+│   ├── architecture.md
+│   ├── phase0.md
+│   ├── phase1.md
+│   ├── phase2.md
+│   ├── phase3.md
+│   ├── phase4.md
+│   ├── phase5.md
+│   ├── phase6.md
+│   ├── phase7.md
+│   ├── phase8.md
+│   ├── phase9.md
+│   └── phase10.md
 │
-├── config/
-│   └── board_config.h
+├── include/
 │
-├── devices/
-│   ├── led/
-│   │   ├── led.cpp
-│   │   └── led.h
-│   │
-│   └── button/
-│       ├── button.cpp
-│       └── button.h
+├── lib/
 │
-└── hal/
-    └── gpio/
-        ├── gpio.cpp
-        └── gpio.h
+├── src/
+│   ├── app/
+│   ├── config/
+│   ├── devices/
+│   ├── hal/
+│   └── main.cpp
+│
+├── test/
+│
+└── platformio.ini
 ```
 
 ---
 
-## Validation Tests
+# Current Progress
 
-### Build Test
+## Phase 0 — Development Environment
 
-* Firmware compiled successfully using PlatformIO.
+**Status:** ✅ Complete
 
-### Flash Test
+Completed:
 
-* Firmware successfully uploaded to the ESP32.
-
-### GPIO Output Test
-
-* LED initialized correctly.
-* LED responded to software commands.
-
-### GPIO Input Test
-
-* Button state correctly detected using the internal pull-up resistor.
-
-### Integration Test
-
-* Pressing the button turned the LED on.
-* Releasing the button turned the LED off.
-
-All tests passed successfully on hardware.
+* PlatformIO project setup
+* VS Code configuration
+* Git repository
+* Build system verification
+* Firmware upload
+* Serial monitor
+* Repository organization
 
 ---
 
-## Engineering Decisions
+## Phase 1 — Firmware Architecture
 
-### Hardware Abstraction Layer
+**Status:** ✅ Complete
 
-A GPIO HAL was introduced to isolate the rest of the firmware from the Arduino API. This allows higher-level modules to work with generic GPIO operations instead of directly calling `pinMode()`, `digitalRead()`, and `digitalWrite()`.
+Completed:
 
-### Device Drivers
-
-The LED and Button were implemented as reusable device drivers. These modules expose behavior instead of hardware details, allowing the application layer to remain focused on robot logic.
-
-### Separation of Concerns
-
-Each module has a single responsibility:
-
-* Board configuration describes the hardware.
-* HAL communicates with the microcontroller.
-* Device drivers represent physical components.
-* Application coordinates device behavior.
-* `main.cpp` serves only as the program entry point.
-
-This separation improves readability, maintainability, and scalability.
+* Project directory structure
+* Application layer
+* Hardware Abstraction Layer
+* Device layer
+* Board configuration
+* Modular firmware organization
 
 ---
 
-## Lessons Learned
+## Phase 2 — GPIO Bring-Up
 
-During this milestone I learned:
+**Status:** ✅ Complete
 
-* How to organize a professional embedded firmware project.
-* Why hardware abstraction layers are important.
-* How to separate application logic from hardware-specific code.
-* How to build reusable device drivers.
-* How to validate firmware using real hardware.
-* How to debug GPIO input and output on an ESP32.
-* How modular firmware architecture scales better than a single Arduino sketch.
+Completed:
+
+* GPIO HAL
+* LED driver
+* Button driver
+* Board configuration
+* Hardware validation
+* ESP32 GPIO testing
+* LED and button integration
+
+The firmware was successfully validated on hardware using an external LED and push button.
 
 ---
 
-## Next Milestone
+## Remaining Roadmap
 
-**Phase 3 — Timing**
+* Phase 3 — Timing
+* Phase 4 — PWM
+* Phase 5 — UART Communication
+* Phase 6 — Sensors
+* Phase 7 — State Machines
+* Phase 8 — Actuator Framework
+* Phase 9 — Safety
+* Phase 10 — FreeRTOS
 
-The next phase will replace blocking programming techniques with non-blocking timing using `millis()`. This will introduce cooperative scheduling and prepare the firmware for managing multiple tasks simultaneously, laying the groundwork for servos, sensors, communication, and more advanced robot behaviors.
+---
+
+# Development Workflow
+
+Every new feature follows the same engineering process.
+
+```
+Requirements
+    ↓
+Architecture
+    ↓
+Interface Design
+    ↓
+Implementation
+    ↓
+Compilation
+    ↓
+Hardware Validation
+    ↓
+Debugging
+    ↓
+Documentation
+    ↓
+Git Commit
+```
+
+No feature is considered complete until it has been validated on physical hardware.
+
+---
+
+# Testing Philosophy
+
+Firmware is tested incrementally.
+
+Each subsystem is validated independently before integration.
+
+Typical testing sequence:
+
+1. Build successfully
+2. Flash firmware
+3. Verify boot
+4. Test individual hardware modules
+5. Integrate modules
+6. Validate complete behavior
+7. Commit working milestone
+
+This approach minimizes debugging complexity and isolates failures.
+
+---
+
+# Coding Principles
+
+The firmware follows several design rules.
+
+* Keep `main.cpp` minimal.
+* Avoid blocking delays.
+* Eliminate magic numbers.
+* Prefer strongly typed interfaces.
+* Encapsulate hardware details.
+* Give every module one clear responsibility.
+* Favor readability over clever optimizations.
+* Design modules to be reusable.
+
+---
+
+# Documentation
+
+Engineering documentation is maintained alongside the firmware.
+
+The `docs/` directory contains:
+
+* Architecture documentation
+* Coding standards
+* Testing procedures
+* Development workflow
+* Phase reports
+* Design decisions
+
+Each completed milestone includes its own report documenting:
+
+* Objectives
+* Architecture
+* Hardware
+* Testing
+* Lessons learned
+* Future improvements
+
+---
+
+# Long-Term Vision
+
+The firmware will evolve from a simple GPIO demonstration into a complete embedded software platform capable of supporting an interactive animatronic robot.
+
+Future capabilities include:
+
+* Coordinated servo animation
+* Sensor fusion
+* UART communication
+* Audio synchronization
+* Robot state management
+* Fault detection
+* Watchdog recovery
+* Real-time task scheduling using FreeRTOS
+
+Throughout development, the emphasis remains on building firmware that reflects professional engineering practices rather than simply achieving functionality.
