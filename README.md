@@ -174,8 +174,8 @@ The objective is to build firmware that resembles what would be developed in a p
 ## Roadmap
 
 - Phase 0 — Development Environment ✅
-- Phase 1 — Firmware Architecture
-- Phase 2 — GPIO Driver
+- Phase 1 — Firmware Architecture ✅
+- Phase 2 — GPIO Driver ✅
 - Phase 3 — Timing & Scheduler
 - Phase 4 — PWM
 - Phase 5 — UART Communication

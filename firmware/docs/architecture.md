@@ -147,22 +147,3 @@ Responsibilities include:
 - 
 
 Business logic should remain outside of `main.cpp`.
-
----
-
-# Current Status
-
-Phase 0
-
-- Development environment
-- Repository organization
-- Initial architecture
-
-Upcoming:
-
-- GPIO
-- Timing
-- PWM
-- UART
-- Sensors
-- State machines
