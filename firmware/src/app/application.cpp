@@ -6,13 +6,16 @@
 #include "../devices/led/led.h"
 
 // timing control variables (unsigned long)
-unsigned long prevMillis = 0;
-const unsigned long interval = 500; // interval duration: 500 ms (0.5 s)
+unsigned long heartbeatLastRun = 0;
+const unsigned long heartbeatInterval = 500; // interval duration: 500 ms (0.5 s)
+
+unsigned long statusLastRun = 0;
+const unsigned long statusInterval = 1000; // interval duration: 1000 ms (1 s)
 
 // Define the devices in an anonymous namespace (file-scope)
 namespace
 {
-    Devices::LED buttonLed(Board::STATUS_LED_PIN);
+    Devices::LED statusLed(Board::STATUS_LED_PIN);
     Devices::LED heartbeatLed(Board::TIMER_LED_PIN);
     Devices::Button button;
 }
@@ -21,7 +24,7 @@ namespace App
 {
     void Application::initialize()
     {
-        buttonLed.initialize();
+        statusLed.initialize();
         heartbeatLed.initialize();
         button.initialize();
     }
@@ -33,19 +36,24 @@ namespace App
 
         if (pressed)
         {
-            buttonLed.on();
+            statusLed.on();
         }
         else
         {
-            buttonLed.off();
+            statusLed.off();
         }
 
         // capture time -> red toggled
         unsigned long currMillis = millis();
         
-        if (currMillis - prevMillis >= interval) {
-            prevMillis = currMillis;
+        if (currMillis - heartbeatLastRun >= heartbeatInterval) {
+            heartbeatLastRun = currMillis;
             heartbeatLed.toggle();
+        }
+
+        if (currMillis - statusLastRun >= statusInterval) {
+            statusLastRun = currMillis;
+            Serial.println("Firmware alive");
         }
     }
 }
