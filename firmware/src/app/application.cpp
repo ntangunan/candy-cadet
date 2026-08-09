@@ -40,10 +40,10 @@ namespace App
         heartbeatLed.initialize();
         button.initialize();
 
-        // capture by value
+        // capture by reference
         int number = 10;
 
-        auto callback = [number]()
+        auto callback = [&number]()
         {
             Serial.println(number);
         };
@@ -51,7 +51,7 @@ namespace App
         callback(); // prints 10
 
         number = 20;
-        callback(); // still prints 10
+        callback(); // now prints 20
     }
     
     void Application::update()
