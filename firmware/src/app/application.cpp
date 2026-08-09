@@ -18,6 +18,18 @@ namespace
     Devices::LED statusLed(Board::STATUS_LED_PIN);
     Devices::LED heartbeatLed(Board::TIMER_LED_PIN);
     Devices::Button button;
+
+    void (*callback)();
+
+    void taskA()
+    {
+        Serial.println("A");
+    }
+
+    void taskB()
+    {
+        Serial.println("B");
+    }
 }
 
 namespace App
@@ -27,6 +39,8 @@ namespace App
         statusLed.initialize();
         heartbeatLed.initialize();
         button.initialize();
+
+        callback = taskA;
     }
     
     void Application::update()
@@ -54,6 +68,9 @@ namespace App
         if (currMillis - statusLastRun >= statusInterval) {
             statusLastRun = currMillis;
             Serial.println("Firmware alive");
+            callback = taskB; 
         }
+        
+        callback();
     }
 }
