@@ -40,10 +40,18 @@ namespace App
         heartbeatLed.initialize();
         button.initialize();
 
-        callback = []()
+        // capture by value
+        int number = 10;
+
+        auto callback = [number]()
         {
-            Serial.println("Lambda A");
+            Serial.println(number);
         };
+
+        callback(); // prints 10
+
+        number = 20;
+        callback(); // still prints 10
     }
     
     void Application::update()
@@ -73,6 +81,6 @@ namespace App
             Serial.println("Firmware alive");
         }
         
-        callback();
+        // callback();
     }
 }
