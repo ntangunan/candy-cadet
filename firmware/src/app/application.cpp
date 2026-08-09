@@ -21,15 +21,15 @@ namespace
 
     void (*callback)();
 
-    void taskA()
-    {
-        Serial.println("A");
-    }
+    // void taskA()
+    // {
+    //     Serial.println("A");
+    // }
 
-    void taskB()
-    {
-        Serial.println("B");
-    }
+    // void taskB()
+    // {
+    //     Serial.println("B");
+    // }
 }
 
 namespace App
@@ -40,7 +40,10 @@ namespace App
         heartbeatLed.initialize();
         button.initialize();
 
-        callback = taskA;
+        callback = []()
+        {
+            Serial.println("Lambda A");
+        };
     }
     
     void Application::update()
@@ -68,7 +71,6 @@ namespace App
         if (currMillis - statusLastRun >= statusInterval) {
             statusLastRun = currMillis;
             Serial.println("Firmware alive");
-            callback = taskB; 
         }
         
         callback();
