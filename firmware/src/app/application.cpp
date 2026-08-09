@@ -16,10 +16,11 @@ const unsigned long statusInterval = 1000; // interval duration: 1000 ms (1 s)
 namespace
 {
     Devices::LED statusLed(Board::STATUS_LED_PIN);
-    Devices::LED heartbeatLed(Board::TIMER_LED_PIN);
+    Devices::LED heartbeatLed(Board::HEARTBEAT_LED_PIN);
+    Devices::LED callbackLed(Board::CALLBACK_LED_PIN);
     Devices::Button button;
 
-    void (*callback)();
+    // void (*heartbeatCallback)();
 
     // void taskA()
     // {
@@ -38,20 +39,16 @@ namespace App
     {
         statusLed.initialize();
         heartbeatLed.initialize();
+        callbackLed.initialize();
         button.initialize();
 
-        // capture by reference
-        int number = 10;
-
-        auto callback = [&number]()
+        // capture by heartbeatLed by reference
+        auto testCallback = [&]()
         {
-            Serial.println(number);
+            callbackLed.toggle();
         };
-
-        callback(); // prints 10
-
-        number = 20;
-        callback(); // now prints 20
+        
+        testCallback();
     }
     
     void Application::update()
@@ -68,19 +65,20 @@ namespace App
             statusLed.off();
         }
 
-        // capture time -> red toggled
+        // capture time
         unsigned long currMillis = millis();
         
+        // toggle red through timing interval
         if (currMillis - heartbeatLastRun >= heartbeatInterval) {
             heartbeatLastRun = currMillis;
             heartbeatLed.toggle();
         }
 
+        // print status to serial monitor
         if (currMillis - statusLastRun >= statusInterval) {
             statusLastRun = currMillis;
             Serial.println("Firmware alive");
         }
         
-        // callback();
     }
 }
