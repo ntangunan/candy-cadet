@@ -15,9 +15,9 @@ const unsigned long statusInterval = 1000; // interval duration: 1000 ms (1 s)
 // Define the devices in an anonymous namespace (file-scope)
 namespace
 {
-    Devices::LED statusLed(Board::STATUS_LED_PIN);
+    Devices::LED buttonControlledLed(Board::BUTTON_CONTROLLED_LED_PIN);
     Devices::LED heartbeatLed(Board::HEARTBEAT_LED_PIN);
-    Devices::LED callbackLed(Board::CALLBACK_LED_PIN);
+    Devices::LED fastFlashLED(Board::FAST_FLASH_LED_PIN);
     Devices::Button button;
 
     // void (*heartbeatCallback)();
@@ -37,18 +37,30 @@ namespace App
 {
     void Application::initialize()
     {
-        statusLed.initialize();
+        buttonControlledLed.initialize();
         heartbeatLed.initialize();
-        callbackLed.initialize();
+        fastFlashLED.initialize();
         button.initialize();
 
-        // capture by heartbeatLed by reference
-        auto testCallback = [&]()
+        auto heartbeatLedCallback = []()
         {
-            callbackLed.toggle();
+            heartbeatLed.toggle();
+        };
+
+        auto fastFlashCallback = []()
+        {
+            fastFlashLED.toggle();
+        };
+
+        auto statusCallback = []()
+        {
+            Serial.println("Firmware alive");
         };
         
-        testCallback();
+        heartbeatLedCallback();
+        fastFlashCallback();
+        statusCallback();
+        
     }
     
     void Application::update()
@@ -58,11 +70,11 @@ namespace App
 
         if (pressed)
         {
-            statusLed.on();
+            buttonControlledLed.on();
         }
         else
         {
-            statusLed.off();
+            buttonControlledLed.off();
         }
 
         // capture time
