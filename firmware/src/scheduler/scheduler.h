@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace Timing
 {
     class Scheduler
@@ -16,7 +18,9 @@ namespace Timing
         void update();
 
     private:
-        Task task_;
+        static const std::size_t MAX_TASKS = 10;
+        Task tasks_[MAX_TASKS];
+        std::size_t taskCount_ = 0;
     };
 
 }

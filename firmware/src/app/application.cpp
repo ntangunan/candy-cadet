@@ -21,20 +21,20 @@ namespace
     Devices::Button button;
 
     // --------------------------------------------------
-    // Callbacks (converting lambda to a func ptr whose func returns void and takes no arguments)
+    // Callbacks
     // --------------------------------------------------
 
-    void (*heartbeatLedCallback)() = []()
+    auto heartbeatLedCallback = []()
         {
             heartbeatLed.toggle();
         };
 
-    void (*fastFlashCallback)() = []()
+    auto fastFlashCallback = []()
         {
             fastFlashLED.toggle();
         };
 
-    void (*statusCallback)() = []()
+    auto statusPrintCallback = []()
         {
             Serial.println("Firmware alive");
         };
@@ -54,6 +54,18 @@ namespace
         500, // interval duration: 500 ms (0.5 s)
         0
     };
+
+    Timing::Scheduler::Task fastFlashTask {
+        fastFlashCallback,
+        200, // interval duration: 200 ms (0.2 s)
+        0
+    };
+
+    Timing::Scheduler::Task statusPrintTask {
+        statusPrintCallback,
+        1000, // interval duration: 500 ms (0.5 s)
+        0
+    };
 }
 
 namespace App
@@ -68,6 +80,9 @@ namespace App
 
         // scheduler tasks
         scheduler.addTask(heartbeatTask);
+        scheduler.addTask(fastFlashTask);
+        scheduler.addTask(statusPrintTask);
+
     }
     
     void Application::update()
