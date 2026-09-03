@@ -149,8 +149,8 @@ namespace App
         pwmLed0.configure(19, 0, 3, 8);
         pwmLed1.configure(18, 1, 5000, 8);
 
-        pwmLed0.setDuty(128);
-        pwmLed1.setDuty(128);
+        pwmLed0.setDuty(255);
+        pwmLed1.setDuty(32);
 
         pwmLed0.start();
         pwmLed1.start();

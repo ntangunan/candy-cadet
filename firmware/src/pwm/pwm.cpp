@@ -21,7 +21,7 @@ void PWM::configure(int gpioPin, int channel, int frequency, int resolution)
 void PWM::setDuty(int duty)
 {
     _duty = duty;
-    ledcWrite(_channel, duty); // ledc channel, duty cycle: 128 / 255 = ~50%
+    ledcWrite(_channel, duty);
 }
 
 void PWM::start()
