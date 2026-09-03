@@ -1,13 +1,18 @@
-#include "application.h"
-#include "../scheduler/scheduler.h"
 #include <Arduino.h>
 
+#include "application.h"
+#include "../scheduler/scheduler.h"
 #include "../config/board_config.h"
 #include "../devices/button/button.h"
 #include "../devices/led/led.h"
+#include "../pwm/pwm.h"
 
-int pwmDuty = 0;
-int pwmDirection = 1;
+int pwmDuty0 = 0;
+int pwmDirection0 = 1;
+
+int pwmDuty1 = 0;
+int pwmDirection1 = 1;
+
 // think of these as state of the fade
 // pwmDuty
 //    │
@@ -32,6 +37,11 @@ namespace
     Devices::Button button;
 
     // --------------------------------------------------
+    // PWM
+    // --------------------------------------------------
+    PWM pwmLed0;
+    PWM pwmLed1;
+    // --------------------------------------------------
     // Callbacks
     // --------------------------------------------------
 
@@ -50,24 +60,41 @@ namespace
             Serial.println("Firmware alive");
         };
 
-    auto pwmCallback = []()
+    auto pwmCallback0 = []()
         {
-            ledcWrite(0, pwmDuty);
+            pwmLed0.setDuty(pwmDuty0);
 
-            pwmDuty += pwmDirection;
+            pwmDuty0 += pwmDirection0;
 
-            if (pwmDuty >= 255)
+            if (pwmDuty0 >= 255)
             {
-                pwmDuty = 255;
-                pwmDirection = -1;
+                pwmDuty0 = 255;
+                pwmDirection0 = -1;
             }
-            else if (pwmDuty <= 0)
+            else if (pwmDuty0 <= 0)
             {
-                pwmDuty = 0;
-                pwmDirection = 1;
+                pwmDuty0 = 0;
+                pwmDirection0 = 1;
             }
         };
-    
+
+    auto pwmCallback1 = []()
+        {
+            pwmLed1.setDuty(pwmDuty1);
+
+            pwmDuty1 += pwmDirection1;
+
+            if (pwmDuty1 >= 255)
+            {
+                pwmDuty1 = 255;
+                pwmDirection1 = -1;
+            }
+            else if (pwmDuty1 <= 0)
+            {
+                pwmDuty1 = 0;
+                pwmDirection1 = 1;
+            }
+        };
 
     // --------------------------------------------------
     // Scheduler
@@ -96,8 +123,14 @@ namespace
         0
     };
 
-    Timing::Scheduler::Task pwmTask {
-        pwmCallback,
+    Timing::Scheduler::Task pwmTask0 {
+        pwmCallback0,
+        10, // interval duration: 10 ms
+        0
+    };
+
+    Timing::Scheduler::Task pwmTask1 {
+        pwmCallback1,
         10, // interval duration: 10 ms
         0
     };
@@ -113,16 +146,22 @@ namespace App
         fastFlashLED.initialize();
         button.initialize();
 
-        // pwm setup
-        ledcSetup(0, 1000, 8); // led channel, freq, resolution
-        ledcAttachPin(2, 0); // gpio pin, ledc channel
-        ledcWrite(0, 16); // ledc channel, duty cycle: 128 / 255 = ~50%
+        pwmLed0.configure(19, 0, 3, 8);
+        pwmLed1.configure(18, 1, 5000, 8);
+
+        pwmLed0.setDuty(128);
+        pwmLed1.setDuty(128);
+
+        pwmLed0.start();
+        pwmLed1.start();
 
         // scheduler tasks
         scheduler.addTask(heartbeatTask);
         scheduler.addTask(fastFlashTask);
         scheduler.addTask(statusPrintTask);
-        scheduler.addTask(pwmTask);
+        scheduler.addTask(pwmTask0);
+        scheduler.addTask(pwmTask1);
+
     }
     
     void Application::update()
