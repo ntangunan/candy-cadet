@@ -8,17 +8,18 @@ public:
     // configuration/control functions
     void configure(int pin, int channel, int frequency, int resolution);
     void setDuty(int duty);
+    void setPercentage(int percentage); // whole number like: 50 represents 50%
     void start();
     void stop();
 
 private:
     // PWM configuration
-    int _gpioPin;
-    int _channel;
-    int _frequency;
-    int _resolution;
-    int _duty;
+    int gpioPin_;
+    int channel_;
+    int frequency_;
+    int resolution_;
+    int duty_;
 
     // PWM state
-    bool _isActive;
+    bool isActive_;
 };

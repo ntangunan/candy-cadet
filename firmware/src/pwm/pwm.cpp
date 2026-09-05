@@ -1,47 +1,67 @@
-#include "pwm.h"
 #include <Arduino.h>
 
+#include "pwm.h"
+
 PWM::PWM()
-    : _isActive(false),
-      _duty(0)
+    : isActive_(false),
+      duty_(0)
 {
 }
 
 void PWM::configure(int gpioPin, int channel, int frequency, int resolution)
 {
-    _gpioPin = gpioPin;
-    _channel = channel;
-    _frequency = frequency;
-    _resolution = resolution;
+    gpioPin_ = gpioPin;
+    channel_ = channel;
+    frequency_ = frequency;
+    resolution_ = resolution;
 
-    ledcSetup(_channel, _frequency, _resolution);
-    ledcAttachPin(_gpioPin, _channel);
+    ledcSetup(channel_, frequency_, resolution_);
+    ledcAttachPin(gpioPin_, channel_);
 }
 
 void PWM::setDuty(int duty)
 {
-    _duty = duty;
-    ledcWrite(_channel, duty);
+    duty_ = duty;
+    ledcWrite(channel_, duty);
 }
 
-void PWM::start()
+void PWM::setPercentage(int percentage)
 {
-    if (_isActive == true)
+    if (percentage < 0 || percentage > 100)
     {
         return;
     }
 
-    _isActive = true;
-    setDuty(_duty);
+    int maxDuty = 2;
+
+    for (int i = 1; i < resolution_; i++)
+    {
+        maxDuty *= 2;
+    }
+
+    maxDuty -= 1;
+
+    setDuty((maxDuty * percentage) / 100);
+}
+
+void PWM::start()
+{
+    if (isActive_ == true)
+    {
+        return;
+    }
+
+    isActive_ = true;
+    setDuty(duty_);
 }
 
 void PWM::stop()
 {
-    if (_isActive == false)
+    if (isActive_ == false)
     {
        return;
     }
 
-    _isActive = false;
-    ledcWrite(_channel, 0);
+    isActive_ = false;
+    ledcWrite(channel_, 0);
 }

@@ -7,23 +7,11 @@
 #include "../devices/led/led.h"
 #include "../pwm/pwm.h"
 
-int pwmDuty0 = 0;
-int pwmDirection0 = 1;
+int brightness0 = 0;
+int brightnessDirection0 = 1;
 
-int pwmDuty1 = 0;
-int pwmDirection1 = 1;
-
-// think of these as state of the fade
-// pwmDuty
-//    │
-//    ├── 0 → LED off
-//    ├── 128 → ~50%
-//    └── 255 → full brightness
-
-// pwmDirection
-//    │
-//    ├── +1 → getting brighter
-//    └── -1 → getting darker
+int brightness1 = 0;
+int brightnessDirection1 = 1;
 
 // anonymous namespace (file-scope)
 namespace
@@ -34,6 +22,11 @@ namespace
     Devices::LED buttonControlledLed(Board::BUTTON_CONTROLLED_LED_PIN);
     Devices::LED heartbeatLed(Board::HEARTBEAT_LED_PIN);
     Devices::LED fastFlashLED(Board::FAST_FLASH_LED_PIN);
+
+    // These two LEDs will use PWM
+    Devices::LED pwmLedDevice0(Board::PWM_LED_PIN_0);
+    Devices::LED pwmLedDevice1(Board::PWM_LED_PIN_1);
+
     Devices::Button button;
 
     // --------------------------------------------------
@@ -41,6 +34,7 @@ namespace
     // --------------------------------------------------
     PWM pwmLed0;
     PWM pwmLed1;
+
     // --------------------------------------------------
     // Callbacks
     // --------------------------------------------------
@@ -62,37 +56,37 @@ namespace
 
     auto pwmCallback0 = []()
         {
-            pwmLed0.setDuty(pwmDuty0);
+            pwmLedDevice0.setBrightness(brightness0);
 
-            pwmDuty0 += pwmDirection0;
+            brightness0 += brightnessDirection0;
 
-            if (pwmDuty0 >= 255)
+            if (brightness0 >= 100)
             {
-                pwmDuty0 = 255;
-                pwmDirection0 = -1;
+                brightness0 = 100;
+                brightnessDirection0 = -1;
             }
-            else if (pwmDuty0 <= 0)
+            else if (brightness0 <= 0)
             {
-                pwmDuty0 = 0;
-                pwmDirection0 = 1;
+                brightness0 = 0;
+                brightnessDirection0= 1;
             }
         };
 
     auto pwmCallback1 = []()
         {
-            pwmLed1.setDuty(pwmDuty1);
+            pwmLedDevice1.setBrightness(brightness1);
 
-            pwmDuty1 += pwmDirection1;
+            brightness1 += brightnessDirection1;
 
-            if (pwmDuty1 >= 255)
+            if (brightness1 >= 100)
             {
-                pwmDuty1 = 255;
-                pwmDirection1 = -1;
+                brightness1 = 100;
+                brightnessDirection1 = -1;
             }
-            else if (pwmDuty1 <= 0)
+            else if (brightness1 <= 0)
             {
-                pwmDuty1 = 0;
-                pwmDirection1 = 1;
+                brightness1 = 0;
+                brightnessDirection1= 1;
             }
         };
 
@@ -140,22 +134,32 @@ namespace App
 {
     void Application::initialize()
     {
-        // devices
+        // --------------------------------------------------
+        // Devices
+        // --------------------------------------------------
         buttonControlledLed.initialize();
         heartbeatLed.initialize();
         fastFlashLED.initialize();
         button.initialize();
 
-        pwmLed0.configure(19, 0, 3, 8);
-        pwmLed1.configure(18, 1, 5000, 8);
+        // --------------------------------------------------
+        // PWM configuration
+        // --------------------------------------------------
 
-        pwmLed0.setDuty(255);
-        pwmLed1.setDuty(32);
+        pwmLed0.configure(Board::PWM_LED_PIN_0, 0, 3, 8);
+        pwmLed1.configure(Board::PWM_LED_PIN_1, 1, 5000, 8);
 
+        // Attach PWM resources to LED devices
+        pwmLedDevice0.enablePWM(pwmLed0);
+        pwmLedDevice1.enablePWM(pwmLed1);
+
+        // Start PWM hardware
         pwmLed0.start();
         pwmLed1.start();
 
-        // scheduler tasks
+        // --------------------------------------------------
+        // Scheduler tasks
+        // --------------------------------------------------
         scheduler.addTask(heartbeatTask);
         scheduler.addTask(fastFlashTask);
         scheduler.addTask(statusPrintTask);

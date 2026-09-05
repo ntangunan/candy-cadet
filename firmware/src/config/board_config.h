@@ -16,8 +16,8 @@ namespace Board
     constexpr uint8_t FAST_FLASH_LED_PIN = 13;
 
     // led with brightness controlled by pwm
-    constexpr uint8_t PWM_LED_PIN_1 = 19;
+    constexpr uint8_t PWM_LED_PIN_0 = 19;
 
     // led with brightness controlled by pwm
-    constexpr uint8_t PWM_LED_PIN_2 = 18;
+    constexpr uint8_t PWM_LED_PIN_1 = 18;
 }
