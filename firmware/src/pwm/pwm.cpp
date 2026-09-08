@@ -2,18 +2,18 @@
 
 #include "pwm.h"
 
-PWM::PWM()
-    : isActive_(false),
+PWM::PWM(const PWMConfig& config)
+    : channel_(config.channel),
+      resolution_(config.resolution),
+      isActive_(false),
       duty_(0)
 {
 }
 
-void PWM::configure(int gpioPin, int channel, int frequency, int resolution)
+void PWM::configure(int gpioPin, int frequency)
 {
     gpioPin_ = gpioPin;
-    channel_ = channel;
     frequency_ = frequency;
-    resolution_ = resolution;
 
     ledcSetup(channel_, frequency_, resolution_);
     ledcAttachPin(gpioPin_, channel_);
@@ -32,16 +32,38 @@ void PWM::setPercentage(int percentage)
         return;
     }
 
-    int maxDuty = 2;
-
-    for (int i = 1; i < resolution_; i++)
-    {
-        maxDuty *= 2;
-    }
-
-    maxDuty -= 1;
+    int maxDuty = getMaxDuty_();
 
     setDuty((maxDuty * percentage) / 100);
+}
+
+void PWM::setPulseWidth(int pulseWidth)
+{
+    // calculate PWM period from frequency
+    if (frequency_ <= 0)
+    {
+        return;
+    }
+    int periodUs = 1000000 / frequency_;
+    
+    // validate pulse width
+    int safePulseWidth = pulseWidth;
+
+    if (safePulseWidth < 0)
+    {
+        safePulseWidth = 0;
+    }
+    else if (safePulseWidth > periodUs)
+    {
+        safePulseWidth = periodUs;
+    }
+
+    // convert pulse width to duty
+    int maxDuty = getMaxDuty_();
+    int duty = (safePulseWidth * maxDuty) / periodUs;
+
+    // send duty to hardware
+    setDuty(duty);
 }
 
 void PWM::start()
@@ -64,4 +86,9 @@ void PWM::stop()
 
     isActive_ = false;
     ledcWrite(channel_, 0);
+}
+
+int PWM::getMaxDuty_()
+{
+    return (1 << resolution_) - 1;
 }

@@ -32,8 +32,20 @@ namespace
     // --------------------------------------------------
     // PWM
     // --------------------------------------------------
-    PWM pwmLed0;
-    PWM pwmLed1;
+    PWMConfig led0Config
+    {
+        0,
+        8
+    };
+
+    PWMConfig led1Config
+    {
+        1,
+        8
+    };
+
+    PWM pwmLed0(led0Config);
+    PWM pwmLed1(led1Config);
 
     // --------------------------------------------------
     // Callbacks
@@ -145,9 +157,8 @@ namespace App
         // --------------------------------------------------
         // PWM configuration
         // --------------------------------------------------
-
-        pwmLed0.configure(Board::PWM_LED_PIN_0, 0, 3, 8);
-        pwmLed1.configure(Board::PWM_LED_PIN_1, 1, 5000, 8);
+        pwmLed0.configure(Board::PWM_LED_PIN_0, 1000);
+        pwmLed1.configure(Board::PWM_LED_PIN_1, 5000);
 
         // Attach PWM resources to LED devices
         pwmLedDevice0.enablePWM(pwmLed0);

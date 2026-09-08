@@ -1,14 +1,21 @@
 #pragma once
 
+struct PWMConfig
+{
+    int channel;
+    int resolution;
+};
+
 class PWM
 {
 public:
-    PWM();
+    PWM(const PWMConfig& config);
 
     // configuration/control functions
-    void configure(int pin, int channel, int frequency, int resolution);
+    void configure(int pin, int frequency);
     void setDuty(int duty);
     void setPercentage(int percentage); // whole number like: 50 represents 50%
+    void setPulseWidth(int pulseWidth); // whole number in micro seconds
     void start();
     void stop();
 
@@ -22,4 +29,7 @@ private:
 
     // PWM state
     bool isActive_;
+
+    // helpers
+    int getMaxDuty_();
 };

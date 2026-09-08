@@ -20,4 +20,7 @@ namespace Board
 
     // led with brightness controlled by pwm
     constexpr uint8_t PWM_LED_PIN_1 = 18;
+
+    // servo controlled by pwm
+    constexpr uint8_t PWM_SERVO_PIN_0 = 25;
 }
