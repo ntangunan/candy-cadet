@@ -5,6 +5,7 @@
 #include "../config/board_config.h"
 #include "../devices/button/button.h"
 #include "../devices/led/led.h"
+#include "../devices/servo/servo.h"
 #include "../pwm/pwm.h"
 
 int brightness0 = 0;
@@ -30,22 +31,57 @@ namespace
     Devices::Button button;
 
     // --------------------------------------------------
-    // PWM
+    // PWM Configuration
     // --------------------------------------------------
-    PWMConfig led0Config
+    PWMConfig led0PwmConfig
     {
         0,
         8
     };
 
-    PWMConfig led1Config
+    PWMConfig led1PwmConfig
     {
         1,
         8
     };
 
-    PWM pwmLed0(led0Config);
-    PWM pwmLed1(led1Config);
+    PWMConfig servo0PwmConfig
+    {
+        2,      // channel
+        8       // resolution
+    };
+
+    // --------------------------------------------------
+    // PWM Resources
+    // --------------------------------------------------
+    PWM pwmLed0(led0PwmConfig);
+    PWM pwmLed1(led1PwmConfig);
+
+    PWM pwmServo0(servo0PwmConfig);
+
+    // --------------------------------------------------
+    // Servo Configuration
+    // --------------------------------------------------
+    Devices::Servo::ServoConfig servo0Config
+    {
+        Board::PWM_SERVO_PIN_0,  // pin
+
+        0,                       // minimum angle
+        180,                     // maximum angle
+        90,                      // default angle
+
+        625,                    // minimum pulse width (us)
+        2665,                    // maximum pulse width (us)
+
+        50                       // frequency (Hz)
+    };
+
+    // --------------------------------------------------
+    // Servo Device
+    // --------------------------------------------------
+
+    Devices::Servo servo0(servo0Config);
+
 
     // --------------------------------------------------
     // Callbacks
@@ -103,6 +139,35 @@ namespace
         };
 
     // --------------------------------------------------
+    // Servo Test
+    // --------------------------------------------------
+
+    int servoTestAngle = 0;
+
+    auto servo0Callback = []()
+    {
+        Serial.print("Servo moving to: ");
+        Serial.print(servoTestAngle);
+        Serial.println(" degrees");
+
+        servo0.moveTo(servoTestAngle);
+
+        // Move through 0 -> 90 -> 180 -> 0...
+        if (servoTestAngle == 0)
+        {
+            servoTestAngle = 90;
+        }
+        else if (servoTestAngle == 90)
+        {
+            servoTestAngle = 180;
+        }
+        else
+        {
+            servoTestAngle = 0;
+        }
+    };
+
+    // --------------------------------------------------
     // Scheduler
     // --------------------------------------------------
     Timing::Scheduler scheduler;
@@ -140,6 +205,12 @@ namespace
         10, // interval duration: 10 ms
         0
     };
+
+    Timing::Scheduler::Task servoTask {
+        servo0Callback,
+        2000, // interval duration: 2000 ms (2 s)
+        0
+    };
 }
 
 namespace App
@@ -169,6 +240,17 @@ namespace App
         pwmLed1.start();
 
         // --------------------------------------------------
+        // Servo PWM
+        // --------------------------------------------------
+
+        // Give the Servo access to its PWM resource.
+        servo0.setPWM(pwmServo0);
+
+        // Servo initializes/configures/starts its PWM
+        // and moves to its default angle.
+        servo0.initialize();
+
+        // --------------------------------------------------
         // Scheduler tasks
         // --------------------------------------------------
         scheduler.addTask(heartbeatTask);
@@ -176,6 +258,7 @@ namespace App
         scheduler.addTask(statusPrintTask);
         scheduler.addTask(pwmTask0);
         scheduler.addTask(pwmTask1);
+        scheduler.addTask(servoTask);
 
     }
     

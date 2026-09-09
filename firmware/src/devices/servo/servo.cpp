@@ -1,4 +1,5 @@
 #include "servo.h"
+#include<Arduino.h>
 
 #include <algorithm>
 
@@ -52,6 +53,13 @@ namespace Devices
         }
 
         int pulseWidth = convertAngleToPulseWidth_(safeAngle);
+
+        // debugging
+        Serial.print("Safe angle: ");
+        Serial.print(safeAngle);
+        Serial.print(" -> Pulse width: ");
+        Serial.print(pulseWidth);
+        Serial.println(" us");
 
         // give pulse width to PWM
         pwm_->setPulseWidth(pulseWidth);

@@ -62,6 +62,12 @@ void PWM::setPulseWidth(int pulseWidth)
     int maxDuty = getMaxDuty_();
     int duty = (safePulseWidth * maxDuty) / periodUs;
 
+    // debugging
+    Serial.print("Pulse width: ");
+    Serial.print(safePulseWidth);
+    Serial.print(" us -> Duty: ");
+    Serial.println(duty);
+
     // send duty to hardware
     setDuty(duty);
 }
