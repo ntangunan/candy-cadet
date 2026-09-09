@@ -5,6 +5,9 @@
 // job is to describe hardware
 namespace Board
 {
+    // PWM hardware resources
+    constexpr int MAX_PWM_RESOURCES = 16; // ESP32 hardware provides 16 pwm channels
+
     // led toggled by button
     constexpr uint8_t BUTTON_CONTROLLED_LED_PIN = 32;
     constexpr uint8_t USER_BUTTON_PIN = 14;
