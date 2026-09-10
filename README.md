@@ -189,8 +189,8 @@ The goal is to eventually replace application-specific timing logic with a reusa
 * [x] Button driver
 * [x] Independent software timers
 * [x] Callback system
-* [ ] Scheduler
-* [ ] PWM
+* [x] Scheduler
+* [x] PWM
 * [ ] Motor driver
 * [ ] UART communication
 * [ ] Sensor framework
