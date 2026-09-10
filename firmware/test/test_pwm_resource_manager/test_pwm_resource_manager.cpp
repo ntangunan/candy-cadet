@@ -256,7 +256,7 @@ void testResourceExhaustion()
     TEST_ASSERT_FALSE(manager.validate(failedHandle));
 }
 
-void setup()
+int main(int argc, char **argv)
 {
     UNITY_BEGIN();
 
@@ -269,9 +269,5 @@ void setup()
     RUN_TEST(testDoubleRelease);
     RUN_TEST(testResourceExhaustion);
 
-    UNITY_END();
-}
-
-void loop()
-{
+    return UNITY_END();
 }

@@ -52,6 +52,12 @@ PWMAllocationHandle PWMResourceManager::allocate(PWMRequirements requirements)
 
         return handle;
     }
+
+    PWMAllocationHandle failedHandle;
+    failedHandle.resourceId = -1;
+    failedHandle.allocationId = -1;
+
+    return failedHandle;
 }
 
 bool PWMResourceManager::validate(PWMAllocationHandle handle)

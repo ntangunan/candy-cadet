@@ -28,9 +28,13 @@ struct PWMAllocationHandle
 
 struct PWMResourceManager
 {
+    PWMResourceManager();
+
     std::array<PWMResource, Board::MAX_PWM_RESOURCES> resources; // collection of PWM resources
+    
     int nextAllocationId;
     int updateNextAllocationId();
+    
     PWMAllocationHandle allocate(PWMRequirements requirements);
     bool validate(PWMAllocationHandle handle);
     void release(PWMAllocationHandle handle);
