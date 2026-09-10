@@ -5,13 +5,25 @@
 // job is to describe hardware
 namespace Board
 {
-    // blue led toggled by button
+    // PWM hardware resources
+    constexpr int MAX_PWM_RESOURCES = 16; // ESP32 hardware provides 16 pwm channels
+
+    // led toggled by button
     constexpr uint8_t BUTTON_CONTROLLED_LED_PIN = 32;
     constexpr uint8_t USER_BUTTON_PIN = 14;
 
-    // red led toggled by timing
+    // led toggled by timing
     constexpr uint8_t HEARTBEAT_LED_PIN = 33;
 
-    // green led toggled by callback
+    // led toggled by callback
     constexpr uint8_t FAST_FLASH_LED_PIN = 13;
+
+    // led with brightness controlled by pwm
+    constexpr uint8_t PWM_LED_PIN_0 = 19;
+
+    // led with brightness controlled by pwm
+    constexpr uint8_t PWM_LED_PIN_1 = 18;
+
+    // servo controlled by pwm
+    constexpr uint8_t PWM_SERVO_PIN_0 = 25;
 }

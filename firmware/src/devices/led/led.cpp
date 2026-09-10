@@ -1,6 +1,4 @@
 #include "led.h"
-
-// #include "../../config/board_config.h"
 #include "../../hal/gpio/gpio.h"
 
 namespace Devices
@@ -33,4 +31,21 @@ namespace Devices
         state_ = !state_;
         HAL::GPIO::write(pin_, state_);
     }
+
+    void LED::enablePWM(PWM& pwm)
+    {
+        pwm_ = &pwm;
+    }
+
+    void LED::setBrightness(int percentage)
+    {
+        if (pwm_ == nullptr)
+        {
+            return;
+        }
+
+        pwm_->setPercentage(percentage);
+    }
+
+
 }
