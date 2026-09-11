@@ -62,7 +62,7 @@ namespace
     // --------------------------------------------------
     // Servo Configuration
     // --------------------------------------------------
-    Devices::Servo::ServoConfig servo0Config
+    Devices::ServoConfig servo0Config
     {
         Board::PWM_SERVO_PIN_0,  // pin
 

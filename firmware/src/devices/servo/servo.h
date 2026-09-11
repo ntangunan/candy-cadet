@@ -5,24 +5,23 @@
 
 namespace Devices
 {
+    struct ServoConfig
+    {
+        std::uint8_t pin;
+
+        int minAngle;
+        int maxAngle;
+        int defaultAngle;
+        
+        int minPulseWidth;
+        int maxPulseWidth;
+
+        int frequency;
+    };
+
     class Servo
     {
     public:
-
-        struct ServoConfig
-        {
-            std::uint8_t pin;
-
-            int minAngle;
-            int maxAngle;
-            int defaultAngle;
-            
-            int minPulseWidth;
-            int maxPulseWidth;
-
-            int frequency;
-        };
-
         Servo(const ServoConfig& config);
 
         // servo behavior
