@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  test-and-build:
+  firmware:
     runs-on: ubuntu-latest
 
     steps:
