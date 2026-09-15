@@ -3,10 +3,11 @@
 #include "application.h"
 #include "../scheduler/scheduler.h"
 #include "../config/board_config.h"
-#include "../devices/button/button.h"
-#include "../devices/led/led.h"
-#include "../devices/servo/servo.h"
 #include "../pwm/pwm.h"
+#include "../devices/led/led.h"
+#include "../devices/button/button.h"
+#include "../devices/servo/servo.h"
+#include "../devices/motor/motor.h"
 
 int brightness0 = 0;
 int brightnessDirection0 = 1;
@@ -62,7 +63,7 @@ namespace
     // --------------------------------------------------
     // Servo Configuration
     // --------------------------------------------------
-    Devices::Servo::ServoConfig servo0Config
+    Devices::ServoConfig servo0Config
     {
         Board::PWM_SERVO_PIN_0,  // pin
 
