@@ -1,0 +1,29 @@
+name: Candy Cadet CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Run native Unity tests
+        working-directory: firmware
+        run: pio test -e native
+
+      - name: Build ESP32 firmware
+        working-directory: firmware
+        run: pio run -e freenove_esp32_wrover
