@@ -3,10 +3,11 @@
 #include "application.h"
 #include "../scheduler/scheduler.h"
 #include "../config/board_config.h"
-#include "../devices/button/button.h"
-#include "../devices/led/led.h"
-#include "../devices/servo/servo.h"
 #include "../pwm/pwm.h"
+#include "../devices/led/led.h"
+#include "../devices/button/button.h"
+#include "../devices/servo/servo.h"
+#include "../devices/motor/motor.h"
 
 int brightness0 = 0;
 int brightnessDirection0 = 1;
