@@ -168,11 +168,13 @@ namespace
     };
 
     // motor callbacks
-    int motorTestStep = 0;
+    int leftMotorTestStep = 0;
+    int rightMotorTestStep = 0;
+
 
     auto leftMotorCallback = []()
     {
-        switch (motorTestStep)
+        switch (leftMotorTestStep)
         {
             case 0:
                 Serial.println("Motor: STOP");
@@ -220,17 +222,17 @@ namespace
                 break;
         }
 
-        motorTestStep++;
+        leftMotorTestStep++;
 
-        if (motorTestStep > 8)
+        if (leftMotorTestStep > 8)
         {
-            motorTestStep = 0;
+            leftMotorTestStep = 0;
         }
     };
 
     auto rightMotorCallback = []()
     {
-        switch (motorTestStep)
+        switch (rightMotorTestStep)
         {
             case 0:
                 Serial.println("Motor: STOP");
@@ -278,11 +280,11 @@ namespace
                 break;
         }
 
-        motorTestStep++;
+        rightMotorTestStep++;
 
-        if (motorTestStep > 8)
+        if (rightMotorTestStep > 8)
         {
-            motorTestStep = 0;
+            rightMotorTestStep = 0;
         }
     };
 
