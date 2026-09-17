@@ -2,36 +2,55 @@
 
 #include <Arduino.h>
 #include "../../pwm/pwm.h"
+#include "../../pwm/pwm_resource_manager.h"
 
-struct MotorConfig
+namespace Devices
 {
-    uint8_t controlPin1;
-    uint8_t controlPin2;
+    struct MotorConfig
+    {
+        uint8_t controlPin1;
+        uint8_t controlPin2;
 
-    uint8_t pwmChannel;
-    uint32_t pwmFrequency;
-    uint8_t pwmResolution;
-};
+        uint32_t pwmFrequency;
+        uint8_t pwmResolution;
+    };
 
-class Motor
-{
-public:
-    Motor(const MotorConfig& config);
+    class Motor
+    {
+    public:
+        Motor(const MotorConfig& config);
 
-    // motor behavior
-    void initialize();
-    void setSpeed(int speed);
-    void stop();
+        // motor behavior
+        void initialize();
+        void setSpeed(int speed);
+        void stop();
 
-private:
-    MotorConfig config_;
+        // pwm behavior
+        void setPWM(
+            PWM& pwmForward,
+            PWM& pwmBackward,
+            PWMResourceManager& manager,
+            PWMAllocationHandle forwardPwmHandle,
+            PWMAllocationHandle backwardPwmHandle
+        );
+        void releasePWM();
 
-    PWM* pwm_ = nullptr;
+    private:
+        MotorConfig config_;
 
-    bool initialized_;
-    int speed_;
+        PWM* forwardPwm_ = nullptr;
+        PWM* backwardPwm_ = nullptr;
 
-    void setForward_(int speed);
-    void setReverse_(int speed);
-};
+        PWMResourceManager* pwmManager_ = nullptr;
 
+        PWMAllocationHandle forwardPwmHandle_;
+        PWMAllocationHandle backwardPwmHandle_;
+
+        int speed_ = 0;
+
+        void setForward_(int speed);
+        void setReverse_(int speed);
+    };
+
+
+}

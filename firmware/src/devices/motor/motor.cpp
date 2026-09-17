@@ -1,0 +1,108 @@
+#include "motor.h"
+
+
+namespace Devices
+{
+    Motor::Motor(const MotorConfig& config)
+        : config_(config),
+        speed_(0)
+        {
+        }
+    
+    void Motor::initialize()
+    {
+        // create/acquire PWM resource
+        if (forwardPwm_ == nullptr || backwardPwm_ == nullptr)
+        {
+            return;
+        }
+
+        forwardPwm_->configure(config_.controlPin1, config_.pwmFrequency);
+        backwardPwm_->configure(config_.controlPin2, config_.pwmFrequency);
+
+        // setup initial state
+        stop();
+        
+        forwardPwm_->start();
+        backwardPwm_->start();
+    }
+
+    void Motor::setSpeed(int speed)
+    {
+        // forwards speed
+        if (speed > 0)
+        {
+
+        }
+
+        // backwards speed
+        if (speed < 0)
+        {
+
+        }
+    }
+
+    void Motor::stop()
+    {
+
+    }
+
+    void Motor::setPWM(
+        PWM& forwardPwm,
+        PWM& backwardPwm,
+        PWMResourceManager& manager,
+        PWMAllocationHandle forwardPwmHandle,
+        PWMAllocationHandle backwardPwmHandle
+
+    )
+    {
+        if (forwardPwm_ != nullptr ||
+            backwardPwm_ != nullptr || 
+            !manager.validate(forwardPwmHandle)||
+            !manager.validate(backwardPwmHandle))
+        {
+            return;
+        }
+
+        forwardPwm_ = &forwardPwm;
+        backwardPwm_ = &backwardPwm;
+        pwmManager_ = &manager;
+        forwardPwmHandle_ = forwardPwmHandle;
+        backwardPwmHandle_ = backwardPwmHandle;
+    }
+
+    void Motor::releasePWM()
+    {
+        if (forwardPwm_ == nullptr || 
+            backwardPwm_ == nullptr || 
+            pwmManager_ == nullptr)
+        {
+            return;
+        }
+
+        forwardPwm_->stop();
+        backwardPwm_->stop();
+
+        pwmManager_->release(forwardPwmHandle_);
+        pwmManager_->release(backwardPwmHandle_);
+
+        forwardPwm_ = nullptr;
+        backwardPwm_ = nullptr;
+        pwmManager_= nullptr;
+        forwardPwmHandle_ = {-1, -1};
+        backwardPwmHandle_ = {-1, -1};
+    }
+
+    void Motor::setForward_(int speed)
+    {
+        forwardPwm_->setPercentage(speed);
+        backwardPwm_->setPercentage(0);
+    }
+
+    void Motor::setReverse_(int speed)
+    {
+        backwardPwm_->setPercentage(speed);
+        forwardPwm_->setPercentage(0);
+    }
+    
+}
