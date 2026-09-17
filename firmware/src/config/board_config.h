@@ -26,11 +26,11 @@ namespace Board
 
     // tt motors controlled by pwm 
     // left motor A
-    constexpr uint8_t LEFT_MOTOR_A_CONTROL_PIN_1 = 25;
-    constexpr uint8_t LEFT_MOTOR_A_CONTROL_PIN_2 = 26;
+    constexpr uint8_t LEFT_A_MOTOR_FORWARD_PIN = 25;
+    constexpr uint8_t LEFT_A_MOTOR_BACKWARD_PIN = 26;
 
     // right motor B
-    constexpr uint8_t RIGHT_MOTOR_B_CONTROL_PIN_1 = 27;
-    constexpr uint8_t RIGHT_MOTOR_B_CONTROL_PIN_2 = 14;
+    constexpr uint8_t RIGHT_B_MOTOR_FORWARD_PIN = 27;
+    constexpr uint8_t RIGHT_B_MOTOR_BACKWARD_PIN_2 = 14;
 
 }
