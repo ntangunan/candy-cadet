@@ -29,22 +29,28 @@ namespace Devices
 
     void Motor::setSpeed(int speed)
     {
-        // forwards speed
         if (speed > 0)
         {
-
-        }
-
-        // backwards speed
-        if (speed < 0)
+            setForward_(speed);
+        } else if (speed < 0)
         {
-
+            setBackward_(speed);
+        } 
+        else
+        {
+            stop();
         }
+
+        speed_ = speed;
+
     }
 
     void Motor::stop()
     {
+        forwardPwm_->setPercentage(0);
+        backwardPwm_->setPercentage(0);
 
+        speed_ = 0;
     }
 
     void Motor::setPWM(
