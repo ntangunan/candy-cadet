@@ -29,7 +29,6 @@ namespace Devices
         void initialize();
         void moveTo(int angle);
         void moveToDefault();
-        void releasePWM();
 
         // pwm behavior
         void setPWM(
@@ -37,6 +36,7 @@ namespace Devices
             PWMResourceManager& manager,
             PWMAllocationHandle handle
         );
+        void releasePWM();
     
     private:
         ServoConfig config_;
