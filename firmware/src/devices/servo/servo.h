@@ -17,7 +17,7 @@ namespace Devices
         int minPulseWidth;
         int maxPulseWidth;
 
-        int pwmFrequency;
+        uint32_t pwmFrequency;
     };
 
     class Servo

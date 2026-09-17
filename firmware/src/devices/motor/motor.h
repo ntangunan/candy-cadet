@@ -49,7 +49,7 @@ namespace Devices
         int speed_ = 0;
 
         void setForward_(int speed);
-        void setReverse_(int speed);
+        void setBackward_(int speed);
     };
 
 

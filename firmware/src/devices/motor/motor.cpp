@@ -105,9 +105,10 @@ namespace Devices
         backwardPwm_->setPercentage(0);
     }
 
-    void Motor::setReverse_(int speed)
+    void Motor::setBackward_(int speed)
     {
-        backwardPwm_->setPercentage(speed);
+        // cancelling the negative speed argument because PWM::setPercentage does not accept negative values
+        backwardPwm_->setPercentage(-speed);
         forwardPwm_->setPercentage(0);
     }
     
