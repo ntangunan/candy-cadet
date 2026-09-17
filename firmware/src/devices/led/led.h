@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "../../pwm/pwm.h"
+#include "../../pwm/pwm_resource_manager.h"
 
 
 // never exposes GPIO (ex: shouldn't know what pin the LED is connected to)
@@ -20,7 +21,12 @@ namespace Devices
         void toggle();
 
         // pwm behavior
-        void enablePWM(PWM& pwm);
+        void enablePWM(
+            PWM& pwm,
+            PWMResourceManager& manager,
+            PWMAllocationHandle handle
+        );
+        void releasePWM();
         void setBrightness(int percentage);
     
     private:
@@ -28,6 +34,8 @@ namespace Devices
         bool state_ = false;
 
         PWM* pwm_ = nullptr;
+        PWMResourceManager* pwmManager_ = nullptr;
+        PWMAllocationHandle pwmHandle_{-1, -1};
 
     };
 }

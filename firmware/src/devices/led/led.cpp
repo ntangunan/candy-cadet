@@ -32,14 +32,42 @@ namespace Devices
         HAL::GPIO::write(pin_, state_);
     }
 
-    void LED::enablePWM(PWM& pwm)
+    void LED::enablePWM(
+        PWM& pwm,
+        PWMResourceManager& manager,
+        PWMAllocationHandle handle
+    )
     {
+        if (pwm_ != nullptr || !manager.validate(handle))
+        {
+            return;
+        }
+
         pwm_ = &pwm;
+        pwmManager_ = &manager;
+        pwmHandle_ = handle;
+    }
+
+    void LED::releasePWM()
+    {
+        if (pwm_ == nullptr || pwmManager_ == nullptr)
+        {
+            return;
+        }
+
+        pwm_->stop();
+        pwmManager_->release(pwmHandle_);
+
+        pwm_ = nullptr;
+        pwmManager_ = nullptr;
+        pwmHandle_ = {-1, -1};
     }
 
     void LED::setBrightness(int percentage)
     {
-        if (pwm_ == nullptr)
+        if (pwm_ == nullptr ||
+            pwmManager_ == nullptr ||
+            !pwmManager_->validate(pwmHandle_))
         {
             return;
         }

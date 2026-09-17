@@ -16,7 +16,7 @@ struct PWMResource
 struct PWMRequirements
 {
     int pin;
-    int frequency;
+    uint32_t frequency;
     int resolution;
 };
 

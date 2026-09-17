@@ -1,12 +1,14 @@
 #include <Arduino.h>
+#include <memory>
 
 #include "application.h"
 #include "../scheduler/scheduler.h"
 #include "../config/board_config.h"
-#include "../devices/button/button.h"
-#include "../devices/led/led.h"
-#include "../devices/servo/servo.h"
 #include "../pwm/pwm.h"
+#include "../devices/led/led.h"
+#include "../devices/button/button.h"
+#include "../devices/servo/servo.h"
+#include "../devices/motor/motor.h"
 
 int brightness0 = 0;
 int brightnessDirection0 = 1;
@@ -26,43 +28,38 @@ namespace
 
     // These two LEDs will use PWM
     Devices::LED pwmLedDevice0(Board::PWM_LED_PIN_0);
-    Devices::LED pwmLedDevice1(Board::PWM_LED_PIN_1);
 
     Devices::Button button;
 
     // --------------------------------------------------
-    // PWM Configuration
+    // PWM Resources and Management
     // --------------------------------------------------
-    PWMConfig led0PwmConfig
-    {
-        0,
-        8
-    };
+    PWMResourceManager pwmResourceManager;
 
-    PWMConfig led1PwmConfig
-    {
-        1,
-        8
-    };
+    // pwm led
+    PWMAllocationHandle led0PwmHandle{-1, -1};
+    std::unique_ptr<PWM> pwmLed0;
 
-    PWMConfig servo0PwmConfig
-    {
-        2,      // channel
-        8       // resolution
-    };
+    // pwm servo
+    PWMAllocationHandle servo0PwmHandle{-1, -1};
+    std::unique_ptr<PWM> pwmServo0;
 
-    // --------------------------------------------------
-    // PWM Resources
-    // --------------------------------------------------
-    PWM pwmLed0(led0PwmConfig);
-    PWM pwmLed1(led1PwmConfig);
+    // pwm left motor
+    PWMAllocationHandle leftMotorForwardPwmHandle{-1, -1};
+    std::unique_ptr<PWM> leftPwmForwardMotor;
+    PWMAllocationHandle leftMotorBackwardPwmHandle{-1, -1};
+    std::unique_ptr<PWM> leftPwmBackwardMotor;
 
-    PWM pwmServo0(servo0PwmConfig);
+    // pwm right motor
+    PWMAllocationHandle rightMotorForwardPwmHandle{-1, -1};
+    std::unique_ptr<PWM> rightPwmForwardMotor;
+    PWMAllocationHandle rightMotorBackwardPwmHandle{-1, -1};
+    std::unique_ptr<PWM> rightPwmBackwardMotor;
 
     // --------------------------------------------------
-    // Servo Configuration
+    // Servo Configurations
     // --------------------------------------------------
-    Devices::Servo::ServoConfig servo0Config
+    Devices::ServoConfig servo0Config
     {
         Board::PWM_SERVO_PIN_0,  // pin
 
@@ -77,16 +74,42 @@ namespace
     };
 
     // --------------------------------------------------
-    // Servo Device
+    // Motor Configurations
+    // --------------------------------------------------
+    Devices::MotorConfig leftMotorConfig
+    {
+        Board::LEFT_A_MOTOR_FORWARD_PIN,
+        Board::LEFT_A_MOTOR_BACKWARD_PIN,
+        1000,
+        8,
+        false
+    };
+
+    Devices::Motor leftMotor(leftMotorConfig);
+
+
+    Devices::MotorConfig rightMotorConfig
+    {
+        Board::RIGHT_B_MOTOR_FORWARD_PIN,
+        Board::RIGHT_B_MOTOR_BACKWARD_PIN,
+        1000,
+        8,
+        true
+    };
+
+    Devices::Motor rightMotor(rightMotorConfig);
+
+    // --------------------------------------------------
+    // Servo Devices
     // --------------------------------------------------
 
     Devices::Servo servo0(servo0Config);
-
 
     // --------------------------------------------------
     // Callbacks
     // --------------------------------------------------
 
+    // led callbacks
     auto heartbeatLedCallback = []()
         {
             heartbeatLed.toggle();
@@ -120,28 +143,7 @@ namespace
             }
         };
 
-    auto pwmCallback1 = []()
-        {
-            pwmLedDevice1.setBrightness(brightness1);
-
-            brightness1 += brightnessDirection1;
-
-            if (brightness1 >= 100)
-            {
-                brightness1 = 100;
-                brightnessDirection1 = -1;
-            }
-            else if (brightness1 <= 0)
-            {
-                brightness1 = 0;
-                brightnessDirection1= 1;
-            }
-        };
-
-    // --------------------------------------------------
-    // Servo Test
-    // --------------------------------------------------
-
+    // servo callbacks
     int servoTestAngle = 0;
 
     auto servo0Callback = []()
@@ -167,6 +169,128 @@ namespace
         }
     };
 
+    // motor callbacks
+    int leftMotorTestStep = 0;
+    int rightMotorTestStep = 0;
+
+
+    auto leftMotorCallback = []()
+    {
+        switch (leftMotorTestStep)
+        {
+            case 0:
+                Serial.println("Motor: STOP");
+                leftMotor.setSpeed(0);
+                break;
+
+            case 1:
+                Serial.println("Motor: FORWARD 25%");
+                leftMotor.setSpeed(25);
+                break;
+
+            case 2:
+                Serial.println("Motor: FORWARD 50%");
+                leftMotor.setSpeed(50);
+                break;
+
+            case 3:
+                Serial.println("Motor: FORWARD 100%");
+                leftMotor.setSpeed(100);
+                break;
+
+            case 4:
+                Serial.println("Motor: STOP");
+                leftMotor.setSpeed(0);
+                break;
+
+            case 5:
+                Serial.println("Motor: REVERSE 25%");
+                leftMotor.setSpeed(-25);
+                break;
+
+            case 6:
+                Serial.println("Motor: REVERSE 50%");
+                leftMotor.setSpeed(-50);
+                break;
+
+            case 7:
+                Serial.println("Motor: REVERSE 100%");
+                leftMotor.setSpeed(-100);
+                break;
+
+            case 8:
+                Serial.println("Motor: STOP");
+                leftMotor.setSpeed(0);
+                break;
+        }
+
+        leftMotorTestStep++;
+
+        if (leftMotorTestStep > 8)
+        {
+            leftMotorTestStep = 0;
+        }
+    };
+
+    auto rightMotorCallback = []()
+    {
+        switch (rightMotorTestStep)
+        {
+            case 0:
+                Serial.println("Motor: STOP");
+                rightMotor.setSpeed(0);
+                break;
+
+            case 1:
+                Serial.println("Motor: FORWARD 25%");
+                rightMotor.setSpeed(25);
+                break;
+
+            case 2:
+                Serial.println("Motor: FORWARD 50%");
+                rightMotor.setSpeed(50);
+                break;
+
+            case 3:
+                Serial.println("Motor: FORWARD 100%");
+                rightMotor.setSpeed(100);
+                break;
+
+            case 4:
+                Serial.println("Motor: STOP");
+                rightMotor.setSpeed(0);
+                break;
+
+            case 5:
+                Serial.println("Motor: REVERSE 25%");
+                rightMotor.setSpeed(-25);
+                break;
+
+            case 6:
+                Serial.println("Motor: REVERSE 50%");
+                rightMotor.setSpeed(-50);
+                break;
+
+            case 7:
+                Serial.println("Motor: REVERSE 100%");
+                rightMotor.setSpeed(-100);
+                break;
+
+            case 8:
+                Serial.println("Motor: STOP");
+                rightMotor.setSpeed(0);
+                break;
+        }
+
+        rightMotorTestStep++;
+
+        if (rightMotorTestStep > 8)
+        {
+            rightMotorTestStep = 0;
+        }
+    };
+
+
     // --------------------------------------------------
     // Scheduler
     // --------------------------------------------------
@@ -176,6 +300,7 @@ namespace
     // Tasks
     // --------------------------------------------------
 
+    // led tasks
     Timing::Scheduler::Task heartbeatTask {
         heartbeatLedCallback,
         500, // interval duration: 500 ms (0.5 s)
@@ -200,15 +325,23 @@ namespace
         0
     };
 
-    Timing::Scheduler::Task pwmTask1 {
-        pwmCallback1,
-        10, // interval duration: 10 ms
-        0
-    };
-
+    // servo tasks
     Timing::Scheduler::Task servoTask {
         servo0Callback,
         2000, // interval duration: 2000 ms (2 s)
+        0
+    };
+
+    // motor tasks
+    Timing::Scheduler::Task leftMotorTask {
+        leftMotorCallback,
+        2000,
+        0
+    };
+
+    Timing::Scheduler::Task rightMotorTask {
+        rightMotorCallback,
+        2000,
         0
     };
 }
@@ -226,29 +359,212 @@ namespace App
         button.initialize();
 
         // --------------------------------------------------
-        // PWM configuration
-        // --------------------------------------------------
-        pwmLed0.configure(Board::PWM_LED_PIN_0, 1000);
-        pwmLed1.configure(Board::PWM_LED_PIN_1, 5000);
-
-        // Attach PWM resources to LED devices
-        pwmLedDevice0.enablePWM(pwmLed0);
-        pwmLedDevice1.enablePWM(pwmLed1);
-
-        // Start PWM hardware
-        pwmLed0.start();
-        pwmLed1.start();
-
-        // --------------------------------------------------
-        // Servo PWM
+        // PWM LED
         // --------------------------------------------------
 
-        // Give the Servo access to its PWM resource.
-        servo0.setPWM(pwmServo0);
+        PWMRequirements led0PwmRequirements
+        {
+            Board::PWM_LED_PIN_0,
+            1000,
+            8
+        };
 
-        // Servo initializes/configures/starts its PWM
-        // and moves to its default angle.
-        servo0.initialize();
+        led0PwmHandle = pwmResourceManager.allocate(led0PwmRequirements);
+
+        if (pwmResourceManager.validate(led0PwmHandle))
+        {
+            PWMConfig led0PwmConfig
+            {
+                led0PwmHandle.resourceId,
+                led0PwmRequirements.resolution
+            };
+
+            pwmLed0 = std::make_unique<PWM>(led0PwmConfig);
+            pwmLed0->configure(
+                led0PwmRequirements.pin,
+                led0PwmRequirements.frequency
+            );
+            pwmLedDevice0.enablePWM(
+                *pwmLed0,
+                pwmResourceManager,
+                led0PwmHandle
+            );
+            pwmLed0->start();
+        }
+
+        // --------------------------------------------------
+        // PWM Servo 
+        // --------------------------------------------------
+
+        PWMRequirements servo0PwmRequirements
+        {
+            servo0Config.pin,
+            servo0Config.pwmFrequency,
+            8
+        };
+
+        servo0PwmHandle = pwmResourceManager.allocate(servo0PwmRequirements);
+
+        if (pwmResourceManager.validate(servo0PwmHandle))
+        {
+            PWMConfig servo0PwmConfig
+            {
+                servo0PwmHandle.resourceId,
+                servo0PwmRequirements.resolution
+            };
+
+            pwmServo0 = std::make_unique<PWM>(servo0PwmConfig);
+            servo0.setPWM(*pwmServo0, pwmResourceManager, servo0PwmHandle);
+
+            // Servo configures/starts its allocated PWM and moves to default.
+            servo0.initialize();
+        }
+
+        // --------------------------------------------------
+        // PWM Motors 
+        // --------------------------------------------------
+
+        // left motor forward PWM
+        PWMRequirements leftMotorForwardPwmRequirements
+        {
+            Board::LEFT_A_MOTOR_FORWARD_PIN,
+            leftMotorConfig.pwmFrequency,
+            leftMotorConfig.pwmResolution
+        };
+
+        leftMotorForwardPwmHandle =
+            pwmResourceManager.allocate(leftMotorForwardPwmRequirements);
+
+        if (pwmResourceManager.validate(leftMotorForwardPwmHandle))
+        {
+            PWMConfig leftMotorForwardPwmConfig
+            {
+                leftMotorForwardPwmHandle.resourceId,
+                leftMotorForwardPwmRequirements.resolution
+            };
+
+            leftPwmForwardMotor =
+                std::make_unique<PWM>(leftMotorForwardPwmConfig);
+
+            leftPwmForwardMotor->configure(
+                leftMotorForwardPwmRequirements.pin,
+                leftMotorForwardPwmRequirements.frequency
+            );
+        }
+
+        // left motor backward PWM
+        PWMRequirements leftMotorBackwardPwmRequirements
+        {
+            Board::LEFT_A_MOTOR_BACKWARD_PIN,
+            leftMotorConfig.pwmFrequency,
+            leftMotorConfig.pwmResolution
+        };
+
+        leftMotorBackwardPwmHandle =
+            pwmResourceManager.allocate(leftMotorBackwardPwmRequirements);
+
+        if (pwmResourceManager.validate(leftMotorBackwardPwmHandle))
+        {
+            PWMConfig leftMotorBackwardPwmConfig
+            {
+                leftMotorBackwardPwmHandle.resourceId,
+                leftMotorBackwardPwmRequirements.resolution
+            };
+
+            leftPwmBackwardMotor =
+                std::make_unique<PWM>(leftMotorBackwardPwmConfig);
+
+            leftPwmBackwardMotor->configure(
+                leftMotorBackwardPwmRequirements.pin,
+                leftMotorBackwardPwmRequirements.frequency
+            );
+        }
+
+        // Give both PWM controllers to the left motor
+        if (pwmResourceManager.validate(leftMotorForwardPwmHandle) &&
+            pwmResourceManager.validate(leftMotorBackwardPwmHandle))
+        {
+            leftMotor.setPWM(
+                *leftPwmForwardMotor,
+                *leftPwmBackwardMotor,
+                pwmResourceManager,
+                leftMotorForwardPwmHandle,
+                leftMotorBackwardPwmHandle
+            );
+
+            leftMotor.initialize();
+        }
+
+        // right motor forward PWM
+        PWMRequirements rightMotorForwardPwmRequirements
+        {
+            Board::RIGHT_B_MOTOR_FORWARD_PIN,
+            rightMotorConfig.pwmFrequency,
+            rightMotorConfig.pwmResolution
+        };
+
+        rightMotorForwardPwmHandle =
+            pwmResourceManager.allocate(rightMotorForwardPwmRequirements);
+
+        if (pwmResourceManager.validate(rightMotorForwardPwmHandle))
+        {
+            PWMConfig rightMotorForwardPwmConfig
+            {
+                rightMotorForwardPwmHandle.resourceId,
+                rightMotorForwardPwmRequirements.resolution
+            };
+
+            rightPwmForwardMotor =
+                std::make_unique<PWM>(rightMotorForwardPwmConfig);
+
+            rightPwmForwardMotor->configure(
+                rightMotorForwardPwmRequirements.pin,
+                rightMotorForwardPwmRequirements.frequency
+            );
+        }
+
+        // right motor backward PWM
+        PWMRequirements rightMotorBackwardPwmRequirements
+        {
+            Board::RIGHT_B_MOTOR_BACKWARD_PIN,
+            rightMotorConfig.pwmFrequency,
+            rightMotorConfig.pwmResolution
+        };
+
+        rightMotorBackwardPwmHandle =
+            pwmResourceManager.allocate(rightMotorBackwardPwmRequirements);
+
+        if (pwmResourceManager.validate(rightMotorBackwardPwmHandle))
+        {
+            PWMConfig rightMotorBackwardPwmConfig
+            {
+                rightMotorBackwardPwmHandle.resourceId,
+                rightMotorBackwardPwmRequirements.resolution
+            };
+
+            rightPwmBackwardMotor =
+                std::make_unique<PWM>(rightMotorBackwardPwmConfig);
+
+            rightPwmBackwardMotor->configure(
+                rightMotorBackwardPwmRequirements.pin,
+                rightMotorBackwardPwmRequirements.frequency
+            );
+        }
+
+        // Give both PWM controllers to the right motor
+        if (pwmResourceManager.validate(rightMotorForwardPwmHandle) &&
+            pwmResourceManager.validate(rightMotorBackwardPwmHandle))
+        {
+            rightMotor.setPWM(
+                *rightPwmForwardMotor,
+                *rightPwmBackwardMotor,
+                pwmResourceManager,
+                rightMotorForwardPwmHandle,
+                rightMotorBackwardPwmHandle
+            );
+
+            rightMotor.initialize();
+        }
 
         // --------------------------------------------------
         // Scheduler tasks
@@ -257,9 +573,9 @@ namespace App
         scheduler.addTask(fastFlashTask);
         scheduler.addTask(statusPrintTask);
         scheduler.addTask(pwmTask0);
-        scheduler.addTask(pwmTask1);
         scheduler.addTask(servoTask);
-
+        scheduler.addTask(leftMotorTask);
+        scheduler.addTask(rightMotorTask);
     }
     
     void Application::update()
