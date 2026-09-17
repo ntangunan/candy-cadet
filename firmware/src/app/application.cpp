@@ -81,7 +81,8 @@ namespace
         Board::LEFT_A_MOTOR_FORWARD_PIN,
         Board::LEFT_A_MOTOR_BACKWARD_PIN,
         1000,
-        8
+        8,
+        false
     };
 
     Devices::Motor leftMotor(leftMotorConfig);
@@ -92,7 +93,8 @@ namespace
         Board::RIGHT_B_MOTOR_FORWARD_PIN,
         Board::RIGHT_B_MOTOR_BACKWARD_PIN,
         1000,
-        8
+        8,
+        true
     };
 
     Devices::Motor rightMotor(rightMotorConfig);

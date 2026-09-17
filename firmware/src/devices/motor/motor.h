@@ -13,6 +13,8 @@ namespace Devices
 
         uint32_t pwmFrequency;
         uint8_t pwmResolution;
+
+        bool directionInverted; // with respect to the left motor's position
     };
 
     class Motor

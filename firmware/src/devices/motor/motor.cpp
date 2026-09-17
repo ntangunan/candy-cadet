@@ -29,6 +29,11 @@ namespace Devices
 
     void Motor::setSpeed(int speed)
     {
+        if (config_.directionInverted)
+        {
+            speed = -speed;
+        }
+        
         if (speed > 0)
         {
             setForward_(speed);

@@ -52,17 +52,20 @@ struct MotorConfig
 
     uint32_t pwmFrequency;
     uint8_t pwmResolution;
+
+    bool directionInverted;
 };
 ```
 
 ### Configuration Fields
 
-| Field           | Description                               |
-| --------------- | ----------------------------------------- |
-| `controlPin1`   | GPIO used for the forward control signal  |
-| `controlPin2`   | GPIO used for the backward control signal |
-| `pwmFrequency`  | PWM operating frequency                   |
-| `pwmResolution` | PWM resolution in bits                    |
+| Field               | Description                               |
+| ------------------- | ----------------------------------------- |
+| `controlPin1`       | GPIO used for the forward control signal  |
+| `controlPin2`       | GPIO used for the backward control signal |
+| `pwmFrequency`      | PWM operating frequency                   |
+| `pwmResolution`     | PWM resolution in bits                    |
+| `directionInverted` | Negates speed to flip motor direction     |
 
 For the current Candy Cadet motor configuration:
 
@@ -72,7 +75,8 @@ Devices::MotorConfig leftMotorConfig
     Board::LEFT_A_MOTOR_FORWARD_PIN,
     Board::LEFT_A_MOTOR_BACKWARD_PIN,
     1000,
-    8
+    8,
+    false
 };
 ```
 
@@ -82,6 +86,7 @@ This configures the motor to use:
 * 8-bit PWM resolution
 * One GPIO for forward control
 * One GPIO for backward control
+* left motor direction is fixed
 
 ---
 
