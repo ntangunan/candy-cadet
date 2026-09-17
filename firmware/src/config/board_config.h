@@ -31,6 +31,6 @@ namespace Board
 
     // right motor B
     constexpr uint8_t RIGHT_B_MOTOR_FORWARD_PIN = 27;
-    constexpr uint8_t RIGHT_B_MOTOR_BACKWARD_PIN_2 = 14;
+    constexpr uint8_t RIGHT_B_MOTOR_BACKWARD_PIN = 14;
 
 }
