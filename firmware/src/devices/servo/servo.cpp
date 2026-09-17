@@ -29,14 +29,16 @@ namespace Devices
             return;
         }
 
-        // create/acquire PWM resource
-        if (pwm_ == nullptr)
+        // the application must allocate and attach a valid PWM resource first
+        if (pwm_ == nullptr ||
+            pwmManager_ == nullptr ||
+            !pwmManager_->validate(pwmHandle_))
         {
             return;
         }
 
-        // TODO: configure PWM for servo operation
-        pwm_->configure(config_.pin, config_.frequency);
+        // configure PWM for servo operation
+        pwm_->configure(config_.pin, config_.pwmFrequency);
 
         // put servo at its initial/default position
         pwm_->start();
@@ -45,6 +47,11 @@ namespace Devices
 
     void Servo::moveTo(int angle)
     {
+        if (pwm_ == nullptr)
+        {
+            return;
+        }
+
         // validate/clamp angle
         int safeAngle = angle;
         if (angle < config_.minAngle || angle > config_.maxAngle)
@@ -53,13 +60,6 @@ namespace Devices
         }
 
         int pulseWidth = convertAngleToPulseWidth_(safeAngle);
-
-        // debugging
-        Serial.print("Safe angle: ");
-        Serial.print(safeAngle);
-        Serial.print(" -> Pulse width: ");
-        Serial.print(pulseWidth);
-        Serial.println(" us");
 
         // give pulse width to PWM
         pwm_->setPulseWidth(pulseWidth);
@@ -70,14 +70,35 @@ namespace Devices
         moveTo(config_.defaultAngle);
     }
 
-    void Servo::setPWM(PWM& pwm)
+    void Servo::setPWM(
+        PWM& pwm,
+        PWMResourceManager& manager,
+        PWMAllocationHandle handle
+    )
     {
-        if (pwm_ != nullptr)
+        if (pwm_ != nullptr || !manager.validate(handle))
         {
             return;
         }
 
         pwm_ = &pwm;
+        pwmManager_ = &manager;
+        pwmHandle_ = handle;
+    }
+
+    void Servo::releasePWM()
+    {
+        if (pwm_ == nullptr || pwmManager_ == nullptr)
+        {
+            return;
+        }
+
+        pwm_->stop();
+        pwmManager_->release(pwmHandle_);
+
+        pwm_ = nullptr;
+        pwmManager_ = nullptr;
+        pwmHandle_ = {-1, -1};
     }
 
     int Servo::convertAngleToPulseWidth_(int angle)

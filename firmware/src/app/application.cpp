@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <memory>
 
 #include "application.h"
 #include "../scheduler/scheduler.h"
@@ -27,38 +28,20 @@ namespace
 
     // These two LEDs will use PWM
     Devices::LED pwmLedDevice0(Board::PWM_LED_PIN_0);
-    Devices::LED pwmLedDevice1(Board::PWM_LED_PIN_1);
 
     Devices::Button button;
 
     // --------------------------------------------------
-    // PWM Configuration
+    // PWM Resources and Management
     // --------------------------------------------------
-    PWMConfig led0PwmConfig
-    {
-        0,
-        8
-    };
+    PWMResourceManager pwmResourceManager;
 
-    PWMConfig led1PwmConfig
-    {
-        1,
-        8
-    };
+    PWMAllocationHandle led0PwmHandle{-1, -1};
+    std::unique_ptr<PWM> pwmLed0;
 
-    PWMConfig servo0PwmConfig
-    {
-        2,      // channel
-        8       // resolution
-    };
+    PWMAllocationHandle servo0PwmHandle{-1, -1};
+    std::unique_ptr<PWM> pwmServo0;
 
-    // --------------------------------------------------
-    // PWM Resources
-    // --------------------------------------------------
-    PWM pwmLed0(led0PwmConfig);
-    PWM pwmLed1(led1PwmConfig);
-
-    PWM pwmServo0(servo0PwmConfig);
 
     // --------------------------------------------------
     // Servo Configuration
@@ -118,24 +101,6 @@ namespace
             {
                 brightness0 = 0;
                 brightnessDirection0= 1;
-            }
-        };
-
-    auto pwmCallback1 = []()
-        {
-            pwmLedDevice1.setBrightness(brightness1);
-
-            brightness1 += brightnessDirection1;
-
-            if (brightness1 >= 100)
-            {
-                brightness1 = 100;
-                brightnessDirection1 = -1;
-            }
-            else if (brightness1 <= 0)
-            {
-                brightness1 = 0;
-                brightnessDirection1= 1;
             }
         };
 
@@ -201,12 +166,6 @@ namespace
         0
     };
 
-    Timing::Scheduler::Task pwmTask1 {
-        pwmCallback1,
-        10, // interval duration: 10 ms
-        0
-    };
-
     Timing::Scheduler::Task servoTask {
         servo0Callback,
         2000, // interval duration: 2000 ms (2 s)
@@ -227,29 +186,66 @@ namespace App
         button.initialize();
 
         // --------------------------------------------------
-        // PWM configuration
+        // PWM LED
         // --------------------------------------------------
-        pwmLed0.configure(Board::PWM_LED_PIN_0, 1000);
-        pwmLed1.configure(Board::PWM_LED_PIN_1, 5000);
 
-        // Attach PWM resources to LED devices
-        pwmLedDevice0.enablePWM(pwmLed0);
-        pwmLedDevice1.enablePWM(pwmLed1);
+        PWMRequirements led0PwmRequirements
+        {
+            Board::PWM_LED_PIN_0,
+            1000,
+            8
+        };
 
-        // Start PWM hardware
-        pwmLed0.start();
-        pwmLed1.start();
+        led0PwmHandle = pwmResourceManager.allocate(led0PwmRequirements);
+
+        if (pwmResourceManager.validate(led0PwmHandle))
+        {
+            PWMConfig led0PwmConfig
+            {
+                led0PwmHandle.resourceId,
+                led0PwmRequirements.resolution
+            };
+
+            pwmLed0 = std::make_unique<PWM>(led0PwmConfig);
+            pwmLed0->configure(
+                led0PwmRequirements.pin,
+                led0PwmRequirements.frequency
+            );
+            pwmLedDevice0.enablePWM(
+                *pwmLed0,
+                pwmResourceManager,
+                led0PwmHandle
+            );
+            pwmLed0->start();
+        }
 
         // --------------------------------------------------
         // Servo PWM
         // --------------------------------------------------
 
-        // Give the Servo access to its PWM resource.
-        servo0.setPWM(pwmServo0);
+        PWMRequirements servo0PwmRequirements
+        {
+            servo0Config.pin,
+            servo0Config.pwmFrequency,
+            8
+        };
 
-        // Servo initializes/configures/starts its PWM
-        // and moves to its default angle.
-        servo0.initialize();
+        servo0PwmHandle = pwmResourceManager.allocate(servo0PwmRequirements);
+
+        if (pwmResourceManager.validate(servo0PwmHandle))
+        {
+            PWMConfig servo0PwmConfig
+            {
+                servo0PwmHandle.resourceId,
+                servo0PwmRequirements.resolution
+            };
+
+            pwmServo0 = std::make_unique<PWM>(servo0PwmConfig);
+            servo0.setPWM(*pwmServo0, pwmResourceManager, servo0PwmHandle);
+
+            // Servo configures/starts its allocated PWM and moves to default.
+            servo0.initialize();
+        }
 
         // --------------------------------------------------
         // Scheduler tasks
@@ -258,7 +254,6 @@ namespace App
         scheduler.addTask(fastFlashTask);
         scheduler.addTask(statusPrintTask);
         scheduler.addTask(pwmTask0);
-        scheduler.addTask(pwmTask1);
         scheduler.addTask(servoTask);
 
     }

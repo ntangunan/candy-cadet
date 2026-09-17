@@ -2,12 +2,13 @@
 
 #include <cstdint>
 #include "../../pwm/pwm.h"
+#include "../../pwm/pwm_resource_manager.h"
 
 namespace Devices
 {
     struct ServoConfig
     {
-        std::uint8_t pin;
+        uint8_t pin;
 
         int minAngle;
         int maxAngle;
@@ -16,7 +17,7 @@ namespace Devices
         int minPulseWidth;
         int maxPulseWidth;
 
-        int frequency;
+        int pwmFrequency;
     };
 
     class Servo
@@ -28,9 +29,14 @@ namespace Devices
         void initialize();
         void moveTo(int angle);
         void moveToDefault();
+        void releasePWM();
 
         // pwm behavior
-        void setPWM(PWM& pwm);
+        void setPWM(
+            PWM& pwm,
+            PWMResourceManager& manager,
+            PWMAllocationHandle handle
+        );
     
     private:
         ServoConfig config_;
@@ -38,5 +44,8 @@ namespace Devices
         int convertAngleToPulseWidth_(int angle);
 
         PWM* pwm_ = nullptr;
+        PWMResourceManager* pwmManager_ = nullptr;
+
+        PWMAllocationHandle pwmHandle_{-1, -1};
     };
 }

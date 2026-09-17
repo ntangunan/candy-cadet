@@ -2,6 +2,7 @@
 
 
 PWMResourceManager::PWMResourceManager()
+    : nextAllocationId(0)
 {
     // setting values to -1 means they currently have no value
     for (std::size_t i = 0; i < resources.size(); i++)
