@@ -10,8 +10,10 @@ namespace Communication
     public:
         ReceiveBuffer();
 
+        // modifies circular buffer's state by adding one byte
         bool write(uint8_t byte);
 
+        // reads the byte that tail is pointing to
         bool read(uint8_t& byte);
 
         // returns the number of bytes currently stored and available for reading
@@ -30,7 +32,7 @@ namespace Communication
 
         uint8_t buffer_[BUFFER_CAPACITY_];
 
-        size_t head_; // where the n ext byte will be written
+        size_t head_; // where the next byte will be written
         size_t tail_; // where the next byte will be read
 
         bool full_;

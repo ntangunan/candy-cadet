@@ -11,12 +11,47 @@ namespace Communication
 
     bool ReceiveBuffer::write(uint8_t byte)
     {
+        if (isFull())
+        {
+            return false;
+        }
 
+        buffer_[head_] = byte;
+
+        head_++;
+
+        if (head_ > BUFFER_CAPACITY_ - 1)
+        {
+            head_ = 0;
+        }
+
+        if (head_ == tail_)
+        {
+            full_ = true;
+        }
+
+        return true;
     }
 
-    bool ReceiveBuffer::read(uint8_t byte)
+    bool ReceiveBuffer::read(uint8_t& byte)
     {
+        if (isEmpty())
+        {
+            return false;
+        }
 
+        byte = buffer_[tail_];
+
+        tail_++;
+
+        if (tail_ > BUFFER_CAPACITY_ - 1)
+        {
+            tail_ = 0;
+        }
+
+        full_ = false;
+
+        return true;
     }
 
     size_t ReceiveBuffer::available() const
