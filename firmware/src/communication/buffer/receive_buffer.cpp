@@ -98,6 +98,10 @@ namespace Communication
 
     void ReceiveBuffer::clear()
     {
+        // dont erase bytes in buffer because the old bytes become irrelevant once the indicies are reset
 
+        head_ = 0;
+        tail_ = 0;
+        full_ = false;
     }
 }

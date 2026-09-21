@@ -25,6 +25,7 @@ namespace Communication
         // checks if buffer is full
         bool isFull() const;
 
+        // discard everything currently stored and return the buffer to the same logical construction state
         void clear();
 
     private:
