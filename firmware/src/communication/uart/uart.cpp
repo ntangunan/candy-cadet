@@ -57,4 +57,33 @@ namespace Communication
 
         return UARTStatus::Ok;
     }
+
+    size_t UART::sendByte(uint8_t byte)
+    {
+        if (!initialized_)
+        {
+            return 0;
+        }
+
+        size_t numAcceptedBytes = serial_.write(byte);
+
+        return numAcceptedBytes;
+    }
+
+    size_t UART::send(const uint8_t* buffer, size_t length)
+    {
+        if (!initialized_)
+        {
+            return 0;
+        }
+
+        if (length == 0 || buffer == nullptr)
+        {
+            return 0;
+        }
+        
+        size_t numAcceptedBytes = serial_.write(buffer, length);
+
+        return numAcceptedBytes;
+    }
 }
