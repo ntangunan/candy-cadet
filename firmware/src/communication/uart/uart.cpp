@@ -44,16 +44,16 @@ namespace Communication
             return UARTStatus::NotInitialized;
         }
 
-        int recieved = serial_.read();
+        int received = serial_.read();
 
         // serial_.read() returns -1 if there is no data to be read
-        if (recieved == -1)
+        if (received == -1)
         {
             return UARTStatus::NoData;
         }
 
         // convert received value to uint8_t
-        byte = static_cast<uint8_t>(recieved);
+        byte = static_cast<uint8_t>(received);
 
         return UARTStatus::Ok;
     }
