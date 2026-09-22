@@ -7,6 +7,8 @@ namespace Communication
     class MessageFramer
     {
     public:
+        // take one incoming byte (from uart) and update the framer's state.
+        // if that byte completes a valid message, tell the caller
         bool processByte(uint8_t byte);
 
         // give me a pointer to the framer bytes but don't allow modification
