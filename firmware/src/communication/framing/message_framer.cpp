@@ -45,12 +45,12 @@ namespace Communication
 
     const uint8_t* MessageFramer::data() const
     {
-
+        return frame_;
     }
 
     size_t MessageFramer::length() const
     {
-
+        return length_;
     }
 
     void MessageFramer::reset()

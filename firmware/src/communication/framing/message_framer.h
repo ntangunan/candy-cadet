@@ -11,9 +11,10 @@ namespace Communication
         // if that byte completes a valid message, tell the caller
         bool processByte(uint8_t byte);
 
-        // give me a pointer to the framer bytes but don't allow modification
+        // return a pointer to the framer bytes but don't allow modification
         const uint8_t* data() const;
 
+        // return the current length of the frame_ array
         size_t length() const;
 
         void reset();
