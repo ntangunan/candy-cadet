@@ -17,6 +17,7 @@ namespace Communication
         // return the current length of the frame_ array
         size_t length() const;
 
+        // reset the framer's state, not the contents of its storage
         void reset();
         
     private:

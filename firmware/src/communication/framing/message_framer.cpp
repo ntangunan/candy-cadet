@@ -55,6 +55,7 @@ namespace Communication
 
     void MessageFramer::reset()
     {
-
+        length_ = 0;
+        overflowing_ = false;
     }
 }
