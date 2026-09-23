@@ -1,13 +1,15 @@
 #pragma once
+
 #include <cstddef>
-#include <cstdint> 
+#include <cstdint>
+#include <string>
+#include <unordered_map>
 
 namespace Communication
 {
-    // the required elements that make up a command's definition
+    // metadata associated with a protocol command.
     struct CommandDefinition
     {
-        const char* name;
         size_t nameLength;
         size_t argumentCount;
     };
@@ -17,7 +19,7 @@ namespace Communication
     public:
         ProtocolConfig();
 
-        // look up function that finds the command definition within our config table
+        // looks up a command definition using the command field.
         const CommandDefinition* findCommand(
             const uint8_t* data,
             size_t fieldStart,
@@ -25,22 +27,6 @@ namespace Communication
         ) const;
 
     private:
-        static constexpr size_t COMMAND_TABLE_SIZE_ = 16;
-
-        struct CommandEntry
-        {
-            const CommandDefinition* definition;
-        };
-
-        CommandEntry commandTable_[COMMAND_TABLE_SIZE_];
-
-        static uint32_t hash_(
-            const uint8_t* data,
-            size_t length
-        );
-
-        bool addCommand_(
-            const CommandDefinition& definition
-        );
+        std::unordered_map<std::string, CommandDefinition> commands_;
     };
-} 
+}

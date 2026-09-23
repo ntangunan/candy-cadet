@@ -1,32 +1,57 @@
 #include "protocol_config.h"
 
-namespace
-{
-    constexpr Communication::CommandDefinition COMMANDS[] =
-    {
-        {"MOTOR", 5, 1},
-        {"SERVO", 5, 1},
-        {"STATUS", 6, 0},
-        {"MODE", 4, 1}
-
-    };
-}
-
 namespace Communication
 {
     ProtocolConfig::ProtocolConfig()
     {
-        // initialize table
-        for (size_t i = 0; i < COMMAND_TABLE_SIZE_; i++)
-        {
-            commandTable_[i].definition = nullptr;
-        }
-        
-        // insert command definitions
-        for (const CommandDefinition& command : COMMANDS)
-        {
-            addCommand_(command);
-        }
+        commands_.emplace(
+            "MOTOR",
+            5,
+            CommandDefinition{1}
+        );
+
+        commands_.emplace(
+            "SERVO",
+            5,
+            CommandDefinition{1}
+        );
+
+        commands_.emplace(
+            "STATUS",
+            6,
+            CommandDefinition{0}
+        );
+
+        commands_.emplace(
+            "MODE",
+            4,
+            CommandDefinition{1}
+        );
     }
 
+    const CommandDefinition* ProtocolConfig::findCommand(
+        const uint8_t* data,
+        size_t fieldStart,
+        size_t fieldLength
+    ) const
+    {
+        if (data == nullptr || fieldLength == 0)
+        {
+            return nullptr;
+        }
+
+        std::string command(
+            reinterpret_cast<const char*>(data + fieldStart),
+            fieldLength
+        );
+
+        auto iterator = commands_.find(command);
+
+        if (iterator == commands_.end())
+        {
+            return nullptr;
+        }
+
+        return &iterator->second;
+    }
 }
