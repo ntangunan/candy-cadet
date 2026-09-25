@@ -1,0 +1,31 @@
+#pragma once
+#include <cstddef>
+#include <cstdint> // for storing bytes
+
+namespace Communication
+{
+    class MessageFramer
+    {
+    public:
+        // take one incoming byte (from uart) and update the framer's state.
+        // if that byte completes a valid message, tell the caller
+        bool processByte(uint8_t byte);
+
+        // return a pointer to the framer bytes but don't allow modification
+        const uint8_t* data() const;
+
+        // return the current length of the frame_ array
+        size_t length() const;
+
+        // reset the framer's state, not the contents of its storage
+        void reset();
+        
+    private:
+        static constexpr size_t MAX_FRAME_SIZE = 128;
+        uint8_t frame_[MAX_FRAME_SIZE];
+
+        size_t length_;
+        bool overflowing_;
+
+    };
+}

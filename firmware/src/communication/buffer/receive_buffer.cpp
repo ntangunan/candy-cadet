@@ -20,7 +20,7 @@ namespace Communication
 
         head_++;
 
-        if (head_ > BUFFER_CAPACITY_ - 1)
+        if (head_ > MAX_BUFFER_SIZE - 1)
         {
             head_ = 0;
         }
@@ -44,7 +44,7 @@ namespace Communication
 
         tail_++;
 
-        if (tail_ > BUFFER_CAPACITY_ - 1)
+        if (tail_ > MAX_BUFFER_SIZE - 1)
         {
             tail_ = 0;
         }
@@ -63,7 +63,7 @@ namespace Communication
 
         if (isFull())
         {
-            return BUFFER_CAPACITY_;
+            return MAX_BUFFER_SIZE;
         }
 
         if (head_ > tail_)
@@ -71,7 +71,7 @@ namespace Communication
             return head_ - tail_;
         }
         
-        return BUFFER_CAPACITY_ - tail_ + head_;
+        return MAX_BUFFER_SIZE - tail_ + head_;
     }
 
     bool ReceiveBuffer::isEmpty() const

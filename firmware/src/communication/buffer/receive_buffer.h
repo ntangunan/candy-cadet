@@ -29,9 +29,9 @@ namespace Communication
         void clear();
 
     private:
-        static constexpr size_t BUFFER_CAPACITY_ = 64;
+        static constexpr size_t MAX_BUFFER_SIZE = 64;
 
-        uint8_t buffer_[BUFFER_CAPACITY_];
+        uint8_t buffer_[MAX_BUFFER_SIZE];
 
         size_t head_; // where the next byte will be written
         size_t tail_; // where the next byte will be read
