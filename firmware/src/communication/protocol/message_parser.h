@@ -2,21 +2,15 @@
 
 #include <cstddef>
 #include <cstdint> // for fixed-width integer bytes
+#include <string>
+
+#include "protocol_config.h"
 
 namespace Communication
 {
     enum class MessageType
     {
         Command
-    };
-
-    // these represent protocol commands, not hardware objects
-    enum class CommandType
-    {
-        Motor,
-        Servo,
-        Status,
-        Mode
     };
 
     enum class ParseResult
@@ -36,7 +30,7 @@ namespace Communication
     struct ParsedMessage
     {
         MessageType type;
-        CommandType command;
+        const CommandDefinition* command;
         uint32_t messageId;
         CommandArguments arguments;
 
@@ -52,6 +46,28 @@ namespace Communication
             size_t length,
             ParsedMessage& message
         );
+    
+        private:
+            // takes a message and splits it into fields separated by space characters
+            ParseResult splitFields(
+                const uint8_t* data,
+                size_t length,
+                size_t& fieldCount
+            );
+
+            // validates the fields of a message by comparing them to protocol_config
+            ParseResult validateFields(
+                size_t fieldCount,
+                ParsedMessage& message
+            );
+
+
+            ProtocolConfig protocolConfig_;
+            
+            static constexpr size_t MAX_FIELDS_ = 6;
+            static constexpr size_t MAX_FIELD_LENGTH_ = 128;
+
+            std::string fields_[MAX_FIELDS_];
     };
 
 
