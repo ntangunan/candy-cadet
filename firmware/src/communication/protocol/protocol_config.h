@@ -1,32 +1,47 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <string>
 #include <unordered_map>
 
 namespace Communication
 {
-    // metadata associated with a protocol command.
+    enum class ArgumentType
+    {
+        Integer,
+        UnsignedInteger,
+        Float
+    };
+
+    struct ArgumentDefinition
+    {
+        const char* name;
+        ArgumentType type;
+    };
+
     struct CommandDefinition
     {
-        size_t nameLength;
+        const ArgumentDefinition* arguments;
         size_t argumentCount;
     };
+
+    using CommandTable = 
+        std::unordered_map<std::string, size_t>;
+    
+    using ProtocolTableMap = 
+        std::unordered_map<std::string, CommandTable>;
 
     class ProtocolConfig
     {
     public:
         ProtocolConfig();
 
-        // looks up a command definition using the command field.
-        const CommandDefinition* findCommand(
-            const uint8_t* data,
-            size_t fieldStart,
-            size_t fieldLength
+        // looks up a specific table given the first field of a message (tableName)
+        const CommandTable* findTable(
+            const std::string& tableName
         ) const;
 
     private:
-        std::unordered_map<std::string, CommandDefinition> commands_;
+        ProtocolTableMap tables_;
     };
 }

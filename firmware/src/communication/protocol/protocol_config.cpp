@@ -1,53 +1,81 @@
 #include "protocol_config.h"
 
+#include <utility>
+
 namespace Communication
 {
     ProtocolConfig::ProtocolConfig()
     {
-        commands_.emplace(
+        static const ArgumentDefinition motorArguments[] =
+        {
+            {"targetId", ArgumentType::UnsignedInteger},
+            {"value", ArgumentType::Integer}
+        };
+
+        static const ArgumentDefinition servoArguments[] =
+        {
+            {"targetId", ArgumentType::UnsignedInteger},
+            {"value", ArgumentType::Integer}
+        };
+
+        static const ArgumentDefinition statusArguments[] =
+        {
+            {"targetId", ArgumentType::UnsignedInteger},
+        };
+
+        static const ArgumentDefinition modeArguments[] =
+        {
+            {"targetId", ArgumentType::UnsignedInteger},
+            {"value", ArgumentType::Integer}
+        };
+
+        CommandTable commandTable;
+
+        commandTable.emplace(
             "MOTOR",
-            5,
-            CommandDefinition{1}
+            CommandDefinition{
+                motorArguments,
+                2
+            }
         );
 
-        commands_.emplace(
+        commandTable.emplace(
             "SERVO",
-            5,
-            CommandDefinition{1}
+            CommandDefinition{
+                servoArguments,
+                2
+            }
         );
 
-        commands_.emplace(
+        commandTable.emplace(
             "STATUS",
-            6,
-            CommandDefinition{0}
+            CommandDefinition{
+                statusArguments,
+                1
+            }
         );
 
-        commands_.emplace(
+        commandTable.emplace(
             "MODE",
-            4,
-            CommandDefinition{1}
+            CommandDefinition{
+                modeArguments,
+                2
+            }
         );
-    }
 
-    const CommandDefinition* ProtocolConfig::findCommand(
-        const uint8_t* data,
-        size_t fieldStart,
-        size_t fieldLength
+        tables_.emplace(
+            "COMMAND",
+            std::move(commandTable)
+        );
+    };
+
+    const CommandTable* ProtocolConfig::findTable(
+        const std::string& tableName
     ) const
     {
-        if (data == nullptr || fieldLength == 0)
-        {
-            return nullptr;
-        }
+        auto iterator = tables_.find(tableName);
 
-        std::string command(
-            reinterpret_cast<const char*>(data + fieldStart),
-            fieldLength
-        );
-
-        auto iterator = commands_.find(command);
-
-        if (iterator == commands_.end())
+        if (iterator == tables_.find(tableName))
         {
             return nullptr;
         }
