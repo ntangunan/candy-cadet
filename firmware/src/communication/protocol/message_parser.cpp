@@ -1,5 +1,9 @@
 #include "message_parser.h"
 
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
+
 namespace Communication
 {
     MessageParser::MessageParser()
@@ -59,7 +63,7 @@ namespace Communication
             char c = static_cast<char>(data[i]);
 
             // space means we reached the end of a field
-            if (c = ' ')
+            if (c == ' ')
             {
                 if (currentField >= MAX_FIELDS_)
                 {
@@ -92,7 +96,7 @@ namespace Communication
             }
         }
 
-        // add final field
+        // validate and count the final field
         if (currentField >= MAX_FIELDS_)
         {
             return ParseResult::InvalidFormat;
@@ -161,7 +165,86 @@ namespace Communication
             return ParseResult::InvalidFormat;
         }
 
+        message.type = MessageType::Command;
         message.command = &command;
+
+        // validate and convert the target ID
+        const ArgumentDefinition& targetIdArgument =
+            command.arguments[0];
+
+        if (targetIdArgument.type != ArgumentType::UnsignedInteger)
+        {
+            return ParseResult::InvalidField;
+        }
+
+        const char* targetIdString =
+            fields_[2].c_str();
+
+        char* targetidEnd = nullptr;
+
+        errno = 0;
+
+        unsigned long targetId =
+            std::strtoul(
+                targetIdString,
+                &targetidEnd,
+                10
+            );
+
+        // check that entire field was a valid number
+        if (
+            targetidEnd == targetIdString ||
+            *targetidEnd != '\0' ||
+            errno == ERANGE ||
+            targetId > UINT32_MAX
+        )
+        {
+            return ParseResult::InvalidField;
+        }
+
+        message.targetId =
+            static_cast<uint32_t>(targetId);
+
+        // validate and convert the command value
+        if (command.argumentCount > 1)
+        {
+            const ArgumentDefinition& valueArgument = 
+                command.arguments[1];
+
+            if (valueArgument.type != ArgumentType::Integer)
+            {
+                return ParseResult::InvalidField;
+            }
+
+            const char* valueString =
+                fields_[3].c_str();
+
+            char* valueEnd = nullptr;
+
+            errno = 0;
+
+            long value = 
+                std::strtol(
+                    valueString,
+                    &valueEnd,
+                    10
+                );
+            
+            // ensure entire field was a valid number
+            if (
+                valueEnd == valueString ||
+                *valueEnd != '\0' ||
+                errno == ERANGE ||
+                value < INT32_MIN ||
+                value > INT32_MAX
+            )
+            {
+                return ParseResult::InvalidField;
+            }
+
+            message.arguments.value = 
+                static_cast<int32_t>(value);
+        }
 
         return ParseResult::Success;
     }
