@@ -58,7 +58,7 @@ namespace Communication
         {
             char c = static_cast<char>(data[i]);
 
-            // reached the end of a field
+            // space means we reached the end of a field
             if (c = ' ')
             {
                 if (currentField >= MAX_FIELDS_)
@@ -66,6 +66,8 @@ namespace Communication
                     return ParseResult::InvalidFormat;
                 }
 
+                // reject empty fields
+                // also includes leading, trailing, or consecutive spaces
                 if (fields_[currentField].empty())
                 {
                     return ParseResult::InvalidFormat;
@@ -73,7 +75,7 @@ namespace Communication
 
                 currentField++;
             }
-            // creating current individual field string
+            // add character to current field
             else
             {
                 if (currentField >= MAX_FIELDS_)
@@ -111,10 +113,56 @@ namespace Communication
         ParsedMessage& message
     )
     {
-        // field 0; message type
-        if (fields_[0] != "COMMAND")
+        // every command requires:
+        // 
+        // COMMAND <command> <arguments...>
+        // 
+        // therefore we need at least:
+        //  fields_[0] = COMMAND
+        //  fields_[1] = command
+        //  fields_[2] = first argument
+        
+        if (fieldCount < 3)
+        {
+            return ParseResult::InvalidFormat;
+        }
+
+        // fields_[0] selects the protocol table
+        const CommandTable* table = 
+            protocolConfig_.findTable(fields_[0]);
+        
+        if (table == nullptr)
         {
             return ParseResult::InvalidField;
         }
+
+        // fields_[1] selects the command
+        auto commandIterator = table->find(fields_[1]);
+
+        if (commandIterator == table->end())
+        {
+            return ParseResult::InvalidField;
+        }
+
+        const CommandDefinition& command =
+            commandIterator->second;
+
+        // the command definition includes all arguments including targetID
+        // 
+        // fields_[0] = table
+        // fields_[1] = command
+        // fields_[2...] = arguments
+        // 
+        // therefore:
+        // 
+        // total fields = 2 + argument count
+        if (fieldCount != 2 + command.argumentCount)
+        {
+            return ParseResult::InvalidFormat;
+        }
+
+        message.command = &command;
+
+        return ParseResult::Success;
     }
 }

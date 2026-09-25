@@ -26,7 +26,7 @@ namespace Communication
     };
 
     using CommandTable = 
-        std::unordered_map<std::string, size_t>;
+        std::unordered_map<std::string, CommandDefinition>;
     
     using ProtocolTableMap = 
         std::unordered_map<std::string, CommandTable>;

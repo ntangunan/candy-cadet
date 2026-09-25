@@ -75,7 +75,7 @@ namespace Communication
     {
         auto iterator = tables_.find(tableName);
 
-        if (iterator == tables_.find(tableName))
+        if (iterator == tables_.end())
         {
             return nullptr;
         }

@@ -31,7 +31,7 @@ namespace Communication
     {
         MessageType type;
         const CommandDefinition* command;
-        uint32_t messageId;
+        uint32_t targetId;
         CommandArguments arguments;
 
     };
@@ -48,7 +48,7 @@ namespace Communication
         );
     
         private:
-            // takes a message and splits it into fields separated by space characters
+            // splits message into fields separated by space characters
             ParseResult splitFields(
                 const uint8_t* data,
                 size_t length,
